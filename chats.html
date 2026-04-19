@@ -115,11 +115,18 @@
   <!-- ── Main ── -->
   <div class="main">
     <div class="topbar"><strong id="chatTitle">Sessions</strong></div>
-    
+    <div class="chat-area">
+      <section class="chat-main" id="chatMain">
+        <div class="status-message" style="margin-top:60px;">Select a session to view messages</div>
+      </section>
+      <div class="composer">
+        <input id="chatInput" placeholder="Select a session to view messages" disabled />
+        <button class="send" id="sendBtn" disabled>Send</button>
+      </div>
     </div>
   </div>
 
-</div>
+  </div>
 <script>
   // ─── CONFIG ──────────────────────────────────────────────────────────────────
   const CONFIG = {
