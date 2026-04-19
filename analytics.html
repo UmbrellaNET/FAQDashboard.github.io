@@ -355,9 +355,9 @@
 
     // ── Upstash REST helpers ──────────────────────────────────────────────────
     async function upstash(path) {
-      const res = await fetch(REDIS_URL + path, {
-        headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
-      });
+      const sep = path.includes('?') ? '&' : '?';
+      const url = REDIS_URL + path + sep + '_token=' + encodeURIComponent(REDIS_TOKEN);
+      const res = await fetch(url, { mode: 'cors' });
       if (!res.ok) throw new Error(`Upstash ${res.status}: ${await res.text()}`);
       return res.json();
     }
