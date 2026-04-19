@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UmbrellaNet — Orders</title>
+
+  <!-- Site favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo.svg">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo.svg">
+
+  <style>
+    :root{
+      --bg:#1c1a2e;
+      --card:#2a2740;
+      --accent:#CE3EC0;
+      --primary:#5E185B;
+      --muted:#2b2b44;
+      --text:#f1e6f9;
+      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg); color:var(--text);display:flex;}
+
+    /* Sidebar - Responsive */
+    .sidebar{
+      width:240px; 
+      background:var(--card); 
+      border-right:1px solid #333; 
+      display:flex; 
+      flex-direction:column; 
+      padding:20px; 
+      height:100vh; 
+      position:sticky; 
+      top:0;
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:20px}
+    .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(100deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+    .brand h1{font-size:18px;margin:0}
+    .nav{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .nav a{color:var(--text);text-decoration:none;padding:10px;border-radius:8px}
+    .nav a:hover{background:var(--muted)}
+    .nav a.active{background:var(--primary);color:white}
+    
+    /* Mobile menu toggle */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 101;
+      background: var(--primary);
+      border: none;
+      border-radius: 6px;
+      width: 40px;
+      height: 40px;
+      color: white;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main{flex:1;overflow-y:auto}
+    .container{max-width:1200px;margin:28px auto;padding:20px;}
+    
+    /* Header - Responsive */
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap: wrap;
+    }
+    h1{margin:0; font-size: clamp(1.5rem, 4vw, 2rem);}
+    
+    .controls{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .search{
+      padding:8px 12px;
+      border-radius:8px;
+      border:1px solid #353042;
+      background:transparent;
+      color:var(--text);
+      min-width: 200px;
+      flex: 1;
+    }
+    .filter{
+      padding:8px 12px;
+      border-radius:8px;
+      border:1px solid #353042;
+      background:var(--accent);
+      color:var(--text);
+    }
+
+    /* Orders Grid - Responsive */
+    .orders{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(min(320px, 100%),1fr));
+      gap:16px;
+    }
+    .order-card{
+      background:var(--card);
+      border-radius:12px;
+      padding:12px;
+      border:1px solid #343041;
+      display: flex;
+      flex-direction: column;
+    }
+    .details{flex:1}
+    .meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .status-select{
+      padding:8px;
+      border-radius:8px;
+      border:1px solid #3a3546;
+      background:var(--primary);
+      color:var(--text);
+      width: 100%;
+      max-width: 150px;
+    }
+    .price{font-weight:700}
+    .field{margin-top:8px;font-size:14px}
+    .btn-small{
+      padding:6px 10px;
+      border-radius:6px;
+      border:0;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:600;
+      white-space: nowrap;
+    }
+
+    .empty{padding:40px;border-radius:12px;text-align:center;color:#bbb;background:rgba(255,255,255,0.02)}
+
+    .legend{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .legend .pill{
+      padding:6px 10px;
+      border-radius:8px;
+      background:#2a2640;
+      font-size: 14px;
+    }
+
+    .modal{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,.8);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:1000;
+    }
+    .modal-content{
+      background:#fff;
+      padding:20px;
+      border-radius:12px;
+      max-width:90%;
+      max-height:90%;
+      overflow:auto;
+      color: #333;
+    }
+    .modal-content img{max-width:100%;height:auto;border-radius:8px}
+    .modal-close{
+      margin-top:10px;
+      padding:6px 12px;
+      background:#5E185B;
+      color:white;
+      border:0;
+      border-radius:6px;
+      cursor:pointer;
+    }
+    
+    /* Mobile-specific styles */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        width: 280px;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .menu-toggle {
+        display: flex;
+      }
+      
+      .main {
+        width: 100%;
+      }
+      
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .controls {
+        width: 100%;
+      }
+      
+      .search, .filter {
+        width: 100%;
+        min-width: auto;
+      }
+      
+      .order-card .btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      .meta {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .status-select {
+        max-width: 100%;
+      }
+    }
+
+    .logo-img {
+      width: 60px;      /* adjust size */
+      height: 60px;
+      object-fit: contain;
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .legend {
+        justify-content: center;
+      }
+      
+      .legend .pill {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="menu-toggle" id="menuToggle">☰</button>
+  
+  <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">
+          <img src="img/logo.svg" alt="" class="logo-img">
+        </div>
+
+        <div>
+          <h1 style="color: #fff;">UmbrellaNet</h1>
+          <div style="font-size:12px; color:white">Admin Dashboard</div>
+        </div>
+      </div>
+
+
+      <nav class="nav">
+        <a href="chats.html" >Chats</a>
+        <a href="analytics.html" >Analytics</a>
+        <a href="cake_orders.html" class="active">Orders</a>
+        <a href="index2.html">Dashboard</a>
+      </nav>
+  </aside>
+
+  <div class="main">
+    <div class="container">
+      <div class="header">
+        <div>
+          <h1>Orders</h1>
+          <div style="font-size:13px;color:#cfc1e9">Manage incoming Orders and update statuses</div>
+        </div>
+        <div class="controls">
+          <input id="search" class="search" placeholder="Search by customer, phone, or order id" />
+          <select id="statusFilter" class="filter">
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="unpaid">Unpaid</option>
+            <option value="collected">Collected</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button id="refresh" style="padding:8px 12px;border-radius:8px;background:var(--primary);border:0;color:white;cursor:pointer">Refresh</button>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="pill">Total Orders: <span id="totalCount">0</span></div>
+        <div class="pill">Paid: <span id="paidCount">0</span></div>
+        <div class="pill">Unpaid: <span id="unpaidCount">0</span></div>
+        <div class="pill">Collected: <span id="collectedCount">0</span></div>
+        <div class="pill">Delivered: <span id="deliveredCount">0</span></div>
+        <div class="pill">Pending: <span id="pendingCount">0</span></div>
+        <div class="pill">Cancelled: <span id="cancelledCount">0</span></div>
+      </div>
+
+      <div class="orders" id="ordersContainer"></div>
+      <template id="orderTpl">
+        <div class="order-card" data-orderid="{{id}}">
+          <div class="details">
+            <div style="display:flex;justify-content:space-between;align-items:start">
+              <div>
+                <div style="font-weight:700">Order #<span class="oid">{{id}}</span> — <span class="customer">{{customer}}</span></div>
+                <div style="font-size:13px;color:#cfc1e9">Phone: <span class="phone">{{phone}}</span></div>
+              </div>
+              <div style="text-align:right">
+                <div class="price">{{price}}</div>
+                <div style="font-size:12px;color:#bfa7e6">{{date}}</div>
+              </div>
+            </div>
+
+            <div class="field">Payment Method: <strong class="payment">{{payment}}</strong></div>
+            <div class="field">Colors: <span class="colors">{{colors}}</span></div>
+            <div class="field">Flavors: <span class="flavors">{{flavors}}</span></div>
+            <div class="field due">
+              {{dueLine}}
+            </div>
+
+
+            <div class="field btns">
+              {{designBtn}}
+              {{proofBtn}}
+            </div>
+
+            <div class="meta">
+              <div>
+                <select class="status-select">
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid</option>
+                  <option value="unpaid">Unpaid</option>
+                  <option value="collected">Collected</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div>
+                <button class="saveStatus btn-small" style="background:var(--accent);color:#1c1026;">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <div id="empty" class="empty" style="display:none">No orders match your filter.</div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div id="modalBody"></div>
+      <button class="modal-close">Close</button>
+    </div>
+  </div>
+
+<script>
+  const UPSTASH_URL = "https://prepared-leopard-18449.upstash.io";
+  const UPSTASH_TOKEN = "AUgRAAIncDExNTYyMDJmNWM2ZDU0ODBhYjY5NGMxODdmYWQ3MGNjOXAxMTg0NDk";
+
+  const ordersContainer = document.getElementById('ordersContainer');
+  const orderTpl = document.getElementById('orderTpl').innerHTML;
+  const totalCount = document.getElementById('totalCount');
+  const paidCount = document.getElementById('paidCount');
+  const unpaidCount = document.getElementById('unpaidCount');
+  const collectedCount = document.getElementById('collectedCount');
+  const deliveredCount = document.getElementById('deliveredCount');
+  const pendingCount = document.getElementById('pendingCount');
+  const cancelledCount = document.getElementById('cancelledCount');
+  const search = document.getElementById('search');
+  const statusFilter = document.getElementById('statusFilter');
+  const refresh = document.getElementById('refresh');
+  const empty = document.getElementById('empty');
+  const modal = document.getElementById('modal');
+  const modalBody = document.getElementById('modalBody');
+  const modalClose = document.querySelector('.modal-close');
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+
+  let orders = [];
+
+  // Mobile menu toggle
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+
+  // Close sidebar when clicking outside on mobile
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768 &&
+        sidebar.classList.contains('active') &&
+        !sidebar.contains(e.target) &&
+        e.target !== menuToggle) {
+      sidebar.classList.remove('active');
+    }
+  });
+
+  async function fetchOrders() {
+  let cursor = 0;
+  const results = [];
+
+  do {
+    const res = await fetch(`${UPSTASH_URL}/scan/${cursor}?match=order*`, {
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+    });
+    const data = await res.json();
+    cursor = data.result[0]; // Next cursor
+    const keys = data.result[1] || [];
+
+    for (const key of keys) {
+      const item = await fetch(`${UPSTASH_URL}/get/${key}`, {
+        headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+      });
+      const json = await item.json();
+      try {
+        const order = JSON.parse(json.result);
+        const orderId = order.id || order.order_number || "Unknown ID";
+        
+        results.push({
+          id: orderId,
+          customer: order.customer || order.user?.name || "Unknown",
+          phone: order.phone || order.user?.phone || "-",
+          price: order.price || order.selected_item || "N/A",
+          date: order.dueDate || order.user?.due_date || order.date || "",
+          time: order.user?.due_time || "",
+          design: null, // Will be populated below
+          proof: null, // Will be populated below
+          payment: order.payment || order.user?.payment_method || "N/A",
+          colors: order.colors || order.user?.colors || "N/A",
+          flavors: order.flavors || order.user?.flavor || "N/A",
+          status: order.status || "pending"
+        });
+      } catch (e) {
+        console.error("Parse error", e);
+      }
+    }
+  } while (cursor !== "0");
+
+  // Now fetch images for all orders
+  await fetchImagesForOrders(results);
+  orders = results;
+  renderOrders();
+}
+
+
+async function fetchImagesForOrders(orders) {
+  // Scan for payment_data records
+  let cursor = 0;
+  const paymentProofs = {};
+  
+  do {
+    const res = await fetch(`${UPSTASH_URL}/scan/${cursor}?match=payment_data*`, {
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+    });
+    const data = await res.json();
+    cursor = data.result[0];
+    const keys = data.result[1] || [];
+
+    for (const key of keys) {
+      const item = await fetch(`${UPSTASH_URL}/get/${key}`, {
+        headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+      });
+      const json = await item.json();
+      if (json.result) {
+        try {
+          const proofData = JSON.parse(json.result);
+          if (proofData.order_number && proofData.image_data) {
+            paymentProofs[proofData.order_number] = `data:image/jpeg;base64,${proofData.image_data}`;
+          }
+        } catch (e) {
+          console.error("Error parsing payment data", e);
+        }
+      }
+    }
+  } while (cursor !== "0");
+
+  // Scan for design_data records
+  cursor = 0;
+  const designImages = {};
+  
+  do {
+    const res = await fetch(`${UPSTASH_URL}/scan/${cursor}?match=design_data*`, {
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+    });
+    const data = await res.json();
+    cursor = data.result[0];
+    const keys = data.result[1] || [];
+
+    for (const key of keys) {
+      const item = await fetch(`${UPSTASH_URL}/get/${key}`, {
+        headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+      });
+      const json = await item.json();
+      if (json.result) {
+        try {
+          const designData = JSON.parse(json.result);
+          if (designData.order_number && designData.image_data) {
+            designImages[designData.order_number] = `data:image/jpeg;base64,${designData.image_data}`;
+          }
+        } catch (e) {
+          console.error("Error parsing design data", e);
+        }
+      }
+    }
+  } while (cursor !== "0");
+
+  // Assign images to orders
+  orders.forEach(order => {
+    if (paymentProofs[order.id]) {
+      order.proof = paymentProofs[order.id];
+    }
+    if (designImages[order.id]) {
+      order.design = designImages[order.id];
+    }
+  });
+}
+
+
+
+function setupModalEvents() {
+  // Close modal when close button is clicked
+  const modalClose = document.querySelector('.modal-close');
+  if (modalClose) {
+    modalClose.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+  }
+
+  // Close modal when clicking outside
+  modal.addEventListener('click', (e) => { 
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'flex') {
+      modal.style.display = 'none';
+    }
+  });
+}
+
+// Call this function after the page loads
+setupModalEvents();
+
+function showModal(content){
+  if(content.match(/^data:image\//)){
+    // For base64 images
+    modalBody.innerHTML = `
+      <div style="text-align: center;">
+        <img src="${escapeHtml(content)}" alt="Preview" style="max-width: 100%; max-height: 70vh; border-radius: 8px;">
+        <div style="margin-top: 10px;">
+          <button onclick="downloadImage('${escapeHtml(content)}')" style="background: #5E185B; color: white; border: 0; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Download Image</button>
+        </div>
+      </div>
+    `;
+  } else if(content.match(/^https?:\/\//)){
+    // For URL images (fallback)
+    let imageUrl = content;
+    if (content.includes('graph.facebook.com')) {
+      imageUrl = content.replace('/picture', '/picture?type=large');
+    }
+    modalBody.innerHTML = `
+      <div style="text-align: center;">
+        <img src="${escapeHtml(imageUrl)}" alt="Preview" style="max-width: 100%; max-height: 70vh; border-radius: 8px;">
+        <div style="margin-top: 10px;">
+          <a href="${escapeHtml(imageUrl)}" target="_blank" style="color: #5E185B; text-decoration: none;">Open in new tab</a>
+        </div>
+      </div>
+    `;
+  } else {
+    modalBody.textContent = content;
+  }
+  modal.style.display = 'flex';
+}
+
+// Add download function for base64 images
+function downloadImage(base64Data) {
+  const link = document.createElement('a');
+  link.href = base64Data;
+  link.download = 'image.jpg';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+async function renderOrders(){
+  ordersContainer.innerHTML = '';
+  let visible = 0;
+
+    orders.forEach(o=>{
+      if(statusFilter.value !== 'all' && o.status !== statusFilter.value) return;
+      const q = search.value.trim().toLowerCase();
+      if(q && !(o.customer.toLowerCase().includes(q) || o.phone.toLowerCase().includes(q) || o.id.includes(q) || (o.design||"").toLowerCase().includes(q))) return;
+      visible++;
+
+      const designBtn = o.design ? `<button class="btn-small showDesign" style="background:#CE3EC0;color:#1c1026" data-content="${encodeURIComponent(o.design)}">View Design</button>` : "";
+      const proofBtn = o.proof ? `<button class="btn-small showProof" style="background:#5E185B;color:#fff" data-content="${encodeURIComponent(o.proof)}">Proof of Payment</button>` : "";
+
+      // ✅ define this FIRST
+      const dueLine = o.date 
+        ? `Due: ${o.date}${o.time ? ' at ' + o.time : ''}` 
+        : '';
+
+      // ✅ now safely use it
+      const html = orderTpl.replace(/\{\{id\}\}/g,o.id)
+                          .replace('{{customer}}',escapeHtml(o.customer))
+                          .replace('{{phone}}',escapeHtml(o.phone))
+                          .replace('{{price}}',escapeHtml(o.price))
+                          .replace('{{date}}',escapeHtml(o.date))
+                          .replace('{{payment}}',escapeHtml(o.payment))
+                          .replace('{{colors}}',escapeHtml(o.colors))
+                          .replace('{{flavors}}',escapeHtml(o.flavors))
+                          .replace('{{dueLine}}', dueLine)
+                          .replace('{{time}}',escapeHtml(o.time))
+                          .replace('{{designBtn}}',designBtn)
+                          .replace('{{proofBtn}}',proofBtn);
+
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html;
+      const card = wrapper.firstElementChild;
+
+      card.querySelector('.status-select').value = o.status;
+      
+
+      // ✅ FIXED SAVE LOGIC
+      card.querySelector('.saveStatus').addEventListener('click', async ()=>{
+        const newStatus = card.querySelector('.status-select').value;
+
+        // Load full original order
+        const res = await fetch(`${UPSTASH_URL}/get/order:${o.id}`, {
+          headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+        });
+        const data = await res.json();
+        let fullOrder;
+        try {
+          fullOrder = JSON.parse(data.result);
+        } catch (e) {
+          fullOrder = {};
+        }
+
+        // Update only the status
+        fullOrder.status = newStatus;
+
+        // Save full order back
+        await fetch(`${UPSTASH_URL}/set/order:${o.id}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${UPSTASH_TOKEN}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(fullOrder)
+        });
+
+        o.status = newStatus;
+        updateCounts();
+        renderOrders();
+      });
+
+      const designBtnEl = card.querySelector('.showDesign');
+      if(designBtnEl){
+        designBtnEl.addEventListener('click', ()=>{
+          showModal(decodeURIComponent(designBtnEl.dataset.content));
+        });
+      }
+      const proofBtnEl = card.querySelector('.showProof');
+      if(proofBtnEl){
+        proofBtnEl.addEventListener('click', ()=>{
+          showModal(decodeURIComponent(proofBtnEl.dataset.content));
+        });
+      }
+
+      ordersContainer.appendChild(card);
+    });
+    empty.style.display = visible===0 ? 'block' : 'none';
+    updateCounts();
+  }
+
+
+  
+  function updateCounts(){
+    totalCount.textContent = orders.length;
+    paidCount.textContent = orders.filter(o=>o.status==='paid').length;
+    unpaidCount.textContent = orders.filter(o=>o.status==='unpaid').length;
+    collectedCount.textContent = orders.filter(o=>o.status==='collected').length;
+    deliveredCount.textContent = orders.filter(o=>o.status==='delivered').length;
+    pendingCount.textContent = orders.filter(o=>o.status==='pending').length;
+    cancelledCount.textContent = orders.filter(o=>o.status==='cancelled').length;
+  }
+
+  function escapeHtml(s){ return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+
+  search.addEventListener('input', renderOrders);
+  statusFilter.addEventListener('change', renderOrders);
+  refresh.addEventListener('click', fetchOrders);
+
+  fetchOrders();
+</script>
+
+</body>
+</html>

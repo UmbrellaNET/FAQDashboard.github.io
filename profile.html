@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+  <title>User Profile</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .profile-header {
+      background-color: #5E185B;
+      color: white;
+      padding: 2rem;
+      border-radius: 0.3rem;
+      margin-bottom: 2rem;
+    }
+    .profile-img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+    }
+    .edit-icon {
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .edit-icon:hover {
+      transform: scale(1.1);
+    }
+    .form-edit {
+      display: none;
+    }
+    .profile-section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      border-radius: 0.3rem;
+      background-color: #f8f9fa;
+    }
+    .btn a {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #32c245; 
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn a:hover {
+      background-color: #CE3EC0 ; /* Darker pink on hover */
+      transform: translateY(-2px);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <!-- Profile Header -->
+
+    <div class="btn">
+      <a href="index2.html">Back</a>
+    </div>
+
+    <div class="profile-header text-center position-relative">
+      <div class="mb-3 position-relative d-inline-block">
+        <img id="profileImage" src="img/user.jpg" class="profile-img rounded-circle shadow" alt="User Image">
+        <i class="fas fa-camera edit-icon position-absolute bottom-0 end-0  p-2 rounded-circle" style="background-color: #fff; color: #5E185B;" onclick="document.getElementById('imageUpload').click()"></i>
+        <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="previewImage(event)">
+      </div>
+      <h2 id="userNameDisplay">Tariro Munzwa</h2>
+      <p id="userTitleDisplay" class="mb-0">Full Stack Developer</p>
+      
+    </div>
+
+    <!-- Personal Information Section -->
+    <div class="profile-section position-relative">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Personal Information</h4>
+        <i class="fas fa-edit edit-icon" onclick="toggleEdit('personalInfo')"></i>
+      </div>
+      
+      <!-- Display View -->
+      <div id="personalInfoView">
+        <p><strong>Name:</strong> <span id="nameDisplay">Tariro Munzwa</span></p>
+        <p><strong>Title:</strong> <span id="titleDisplay">Full Stack Developer</span></p>
+        <p><strong>Email:</strong> <span id="emailDisplay">tariro@gmail.com</span></p>
+        <p><strong>Phone:</strong> <span id="phoneDisplay">+263 78 501 9494</span></p>
+      </div>
+      
+      <!-- Edit Form -->
+      <form id="personalInfoForm" class="form-edit">
+        <div class="mb-3">
+          <label for="nameInput" class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="nameInput" value="Tariro Munzwa">
+        </div>
+        <div class="mb-3">
+          <label for="titleInput" class="form-label">Professional Title</label>
+          <input type="text" class="form-control" id="titleInput" value="Full Stack Developer">
+        </div>
+        <div class="mb-3">
+          <label for="emailInput" class="form-label">Email</label>
+          <input type="email" class="form-control" id="emailInput" value="tariro@gmail.com">
+        </div>
+        <div class="mb-3">
+          <label for="phoneInput" class="form-label">Phone</label>
+          <input type="tel" class="form-control" id="phoneInput" value="+263 78 501 9494">
+        </div>
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-secondary me-2" onclick="toggleEdit('personalInfo')">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="savePersonalInfo()">Save Changes</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- About Section -->
+    <div class="profile-section position-relative">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>About Me</h4>
+        <i class="fas fa-edit edit-icon" onclick="toggleEdit('aboutMe')"></i>
+      </div>
+      
+      <!-- Display View -->
+      <div id="aboutMeView">
+        <p id="bioDisplay">Experienced Full Stack Developer with 5+ years of experience building web applications. Specialized in JavaScript frameworks and cloud technologies.</p>
+      </div>
+      
+      <!-- Edit Form -->
+      <form id="aboutMeForm" class="form-edit">
+        <div class="mb-3">
+          <label for="bioInput" class="form-label">Bio</label>
+          <textarea class="form-control" id="bioInput" rows="4">Experienced Full Stack Developer with 5+ years of experience building web applications. Specialized in JavaScript frameworks and cloud technologies.</textarea>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-secondary me-2" onclick="toggleEdit('aboutMe')">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveAboutMe()">Save Changes</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Social Links Section -->
+    <div class="profile-section position-relative">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Social Links</h4>
+        <i class="fas fa-edit edit-icon" onclick="toggleEdit('socialLinks')"></i>
+      </div>
+      
+      <!-- Display View -->
+      <div id="socialLinksView">
+        <p><strong>LinkedIn:</strong> <span id="linkedinDisplay">linkedin.com/in/tariro-munzwa</span></p>
+        <p><strong>GitHub:</strong> <span id="githubDisplay">github.com/tmunzwa</span></p>
+        <p><strong>Twitter:</strong> <span id="twitterDisplay">twitter.com/tariro_dev</span></p>
+      </div>
+      
+      <!-- Edit Form -->
+      <form id="socialLinksForm" class="form-edit">
+        <div class="mb-3">
+          <label for="linkedinInput" class="form-label">LinkedIn</label>
+          <input type="url" class="form-control" id="linkedinInput" value="linkedin.com/in/tariro-munzwa">
+        </div>
+        <div class="mb-3">
+          <label for="githubInput" class="form-label">GitHub</label>
+          <input type="url" class="form-control" id="githubInput" value="github.com/tmunzwa">
+        </div>
+        <div class="mb-3">
+          <label for="twitterInput" class="form-label">Twitter</label>
+          <input type="url" class="form-control" id="twitterInput" value="twitter.com/tariro_dev">
+        </div>
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-secondary me-2" onclick="toggleEdit('socialLinks')">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveSocialLinks()">Save Changes</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="profile-section border border-danger">
+      <h4 class="text-danger">Danger Zone</h4>
+      <p>Be careful with these actions as they cannot be undone.</p>
+      <a href="change-password.html" class="btn btn-outline-danger">Change Password</a>
+      <button class="btn btn-outline-danger" onclick="confirmDeactivate()">Deactivate Account</button>
+    </div>
+  </div>
+
+  <script>
+    // Initialize with default data structure
+    const defaultProfileData = {
+      name: "Tariro Munzwa",
+      title: "Full Stack Developer",
+      email: "tariro@gmail.com",
+      phone: "+263 78 501 9494",
+      bio: "Experienced Full Stack Developer with 5+ years of experience building web applications. Specialized in JavaScript frameworks and cloud technologies.",
+      linkedin: "linkedin.com/in/tariro-munzwa",
+      github: "github.com/tmunzwa",
+      twitter: "twitter.com/tariro_dev",
+      profileImage: "img/apple-touch-icon.png"
+    };
+
+    // Load saved data when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Try to load saved data, fall back to defaults if none exists
+      const savedData = localStorage.getItem('userProfileData');
+      const profileData = savedData ? JSON.parse(savedData) : defaultProfileData;
+      
+      // Apply the data to the page
+      applySavedData(profileData);
+    });
+
+    function applySavedData(data) {
+      // Update all display elements with saved data
+      document.getElementById('nameDisplay').textContent = data.name;
+      document.getElementById('titleDisplay').textContent = data.title;
+      document.getElementById('emailDisplay').textContent = data.email;
+      document.getElementById('phoneDisplay').textContent = data.phone;
+      document.getElementById('bioDisplay').textContent = data.bio;
+      document.getElementById('linkedinDisplay').textContent = data.linkedin;
+      document.getElementById('githubDisplay').textContent = data.github;
+      document.getElementById('twitterDisplay').textContent = data.twitter;
+      
+      // Update header
+      document.getElementById('userNameDisplay').textContent = data.name;
+      document.getElementById('userTitleDisplay').textContent = data.title;
+      
+      // Update form fields in case user wants to edit again
+      document.getElementById('nameInput').value = data.name;
+      document.getElementById('titleInput').value = data.title;
+      document.getElementById('emailInput').value = data.email;
+      document.getElementById('phoneInput').value = data.phone;
+      document.getElementById('bioInput').value = data.bio;
+      document.getElementById('linkedinInput').value = data.linkedin;
+      document.getElementById('githubInput').value = data.github;
+      document.getElementById('twitterInput').value = data.twitter;
+      
+      // Update profile image if it exists
+      if (data.profileImage) {
+        document.getElementById('profileImage').src = data.profileImage;
+      }
+    }
+
+    function saveToLocalStorage(data) {
+      localStorage.setItem('userProfileData', JSON.stringify(data));
+    }
+
+    function getCurrentProfileData() {
+      const savedData = localStorage.getItem('userProfileData');
+      return savedData ? JSON.parse(savedData) : {...defaultProfileData};
+    }
+
+    // Toggle between view and edit modes
+    function toggleEdit(section) {
+      const view = document.getElementById(`${section}View`);
+      const form = document.getElementById(`${section}Form`);
+      
+      if (view.style.display === 'none') {
+        view.style.display = 'block';
+        form.style.display = 'none';
+      } else {
+        view.style.display = 'none';
+        form.style.display = 'block';
+      }
+    }
+
+    // Save personal information
+    function savePersonalInfo() {
+      const profileData = getCurrentProfileData();
+      
+      profileData.name = document.getElementById('nameInput').value;
+      profileData.title = document.getElementById('titleInput').value;
+      profileData.email = document.getElementById('emailInput').value;
+      profileData.phone = document.getElementById('phoneInput').value;
+      
+      // Update display
+      document.getElementById('nameDisplay').textContent = profileData.name;
+      document.getElementById('titleDisplay').textContent = profileData.title;
+      document.getElementById('emailDisplay').textContent = profileData.email;
+      document.getElementById('phoneDisplay').textContent = profileData.phone;
+      
+      // Update header
+      document.getElementById('userNameDisplay').textContent = profileData.name;
+      document.getElementById('userTitleDisplay').textContent = profileData.title;
+      
+      // Save to localStorage
+      saveToLocalStorage(profileData);
+      
+      toggleEdit('personalInfo');
+    }
+
+    // Save about me
+    function saveAboutMe() {
+      const profileData = getCurrentProfileData();
+      profileData.bio = document.getElementById('bioInput').value;
+      
+      document.getElementById('bioDisplay').textContent = profileData.bio;
+      
+      // Save to localStorage
+      saveToLocalStorage(profileData);
+      
+      toggleEdit('aboutMe');
+    }
+
+    // Save social links
+    function saveSocialLinks() {
+      const profileData = getCurrentProfileData();
+      
+      profileData.linkedin = document.getElementById('linkedinInput').value;
+      profileData.github = document.getElementById('githubInput').value;
+      profileData.twitter = document.getElementById('twitterInput').value;
+      
+      document.getElementById('linkedinDisplay').textContent = profileData.linkedin;
+      document.getElementById('githubDisplay').textContent = profileData.github;
+      document.getElementById('twitterDisplay').textContent = profileData.twitter;
+      
+      // Save to localStorage
+      saveToLocalStorage(profileData);
+      
+      toggleEdit('socialLinks');
+    }
+
+    // Preview uploaded image
+    function previewImage(event) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        const output = document.getElementById('profileImage');
+        output.src = reader.result;
+        
+        // Save image to localStorage
+        const profileData = getCurrentProfileData();
+        profileData.profileImage = reader.result;
+        saveToLocalStorage(profileData);
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    // Confirm account deactivation
+    function confirmDeactivate() {
+      if (confirm('Are you sure you want to deactivate your account? This action cannot be undone.')) {
+        // Clear localStorage if needed
+        localStorage.removeItem('userProfileData');
+        // Then redirect to signout or home page
+        window.location.href = 'signout.html';
+      }
+    }
+  </script>
+
+  <!-- Bootstrap 5 JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UmbrellaNet</title>
+
+  <!-- Site favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo.svg">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo.svg">
+
+  <style>
+    :root{
+      --bg:#1c1a2e; --primary:#5E185B; --accent:#CE3EC0;
+      --muted:#2b2b44; --text:#f1e6f9; --card:#2a2740;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    body{margin:0;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
+    .app{display:grid;grid-template-columns:260px 280px 1fr;height:100vh;}
+    .sidebar{background:var(--card);border-right:1px solid #333;display:flex;flex-direction:column;padding:20px;overflow:hidden;}
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:20px}
+    .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(100deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+    .brand h1{font-size:18px;margin:0}
+    .nav{display:flex;flex-direction:column;gap:8px;margin-top:10px;overflow-y:auto;}
+    .nav a{color:var(--text);text-decoration:none;padding:10px;border-radius:8px}
+    .nav a:hover{background:var(--muted)}.nav a.active{background:var(--primary);color:white}
+    .new-chat{margin-top:auto;}
+    .new-chat input{width:100%;padding:8px;border-radius:8px;border:1px solid #444;background:var(--bg);color:var(--text);margin-bottom:8px}
+    .new-chat button{width:100%;padding:8px;border-radius:8px;border:0;background:var(--primary);color:white;cursor:pointer}
+    .chat-list{background:var(--card);border-right:1px solid #333;display:flex;flex-direction:column;overflow-y:auto}
+    .chat-list h2{font-size:16px;margin:16px;}
+    .chat-item{padding:12px 16px;border-bottom:1px solid #333;cursor:pointer;display:flex;flex-direction:column;}
+    .chat-item:hover{background:var(--muted)}.chat-item.active{background:var(--primary);color:white}
+    .chat-name{font-weight:600;margin-bottom:4px}
+    .chat-preview{font-size:13px;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .chat-time{font-size:11px;color:#999;align-self:flex-end;}
+    .main{display:flex;flex-direction:column;overflow:hidden;}
+    .topbar{background:var(--card);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;flex-shrink:0;}
+    .topbar nav{display:flex;gap:20px}
+    .topbar nav a{color:var(--text);text-decoration:none;font-weight:500}
+    .topbar nav a:hover{color:var(--accent)}
+    .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .chat-main{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#211f38,#1c1a2e)}
+    .message{max-width:70%;padding:12px 14px;border-radius:12px;line-height:1.4;word-wrap:break-word;overflow-wrap:break-word;}
+    /* Customer messages (left) */
+    .user{align-self:flex-start;background:var(--muted);color:var(--text)}
+    /* Bot/Admin messages (right) */
+    .bot{align-self:flex-end;background:var(--accent);color:white}
+    .composer{display:flex;gap:10px;padding:14px;border-top:1px solid #333;align-items:center;background:var(--card);flex-shrink:0;}
+    .composer input{flex:1;padding:10px 12px;border-radius:10px;border:1px solid #444;background:var(--bg);color:var(--text)}
+    .composer button.send{background:var(--primary);color:white;border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .status-message {text-align: center; color: #aaa; font-style: italic; margin: 10px 0;}
+    .message-status {
+      font-size: 11px;
+      margin-top: 4px;
+      text-align: right;
+    }
+    .sending { color: #aaa; }
+    .sent { color: #4CAF50; }
+    .delivered { color: #2196F3; }
+    .read { color: #673AB7; }
+    .failed { color: #F44336; }
+    .date-divider {
+      text-align: center;
+      color: #aaa;
+      font-size: 12px;
+      margin: 16px 0;
+      position: relative;
+    }
+    .date-divider::before,
+    .date-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 30%;
+      height: 1px;
+      background: #444;
+    }
+    .date-divider::before {
+      left: 0;
+    }
+    .date-divider::after {
+      right: 0;
+    }
+
+    .logo-img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+
+    @media (max-width:1000px){.app{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">
+          <img src="img/logo.svg" alt="" class="logo-img">
+        </div>
+
+        <div>
+          <h1 style="color: #fff;">UmbrellaNet</h1>
+          <div style="font-size:12px; color:white">Admin Dashboard</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="chats.html" class="active">Chats</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="cake_orders.html">Orders</a>
+        <a href="index2.html">Dashboard</a>
+      </nav>
+      <div class="new-chat">
+        <input id="newNumber" placeholder="Enter WhatsApp number" />
+        <button id="startChat">Start New Chat</button>
+      </div>
+    </aside>
+
+    <!-- Chat list -->
+    <aside class="chat-list" id="chatList"><h2>Active Chats</h2></aside>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="topbar"><strong id="chatTitle">Chats</strong></div>
+      <div class="chat-area">
+        <section class="chat-main" id="chatMain"></section>
+        <div class="composer"><input id="chatInput" placeholder="Type a message" /><button class="send" id="sendBtn">Send</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      upstash: {
+        endpoint: "https://oriented-gibbon-64178.upstash.io",
+        token: "AfqyAAIncDI4M2Y5OTViZTBjNmE0NzdmODE0MWJkNzIzZDgwZDlkZXAyNjQxNzg"
+      },
+      whatsapp: {
+        apiVersion: 'v18.0',
+        phoneNumberId: '671156652756107',
+        accessToken: 'EAAGPRDbXh9kBQyj5jmIyPivBL2S2a56FgB2e2OScTNIRwWvjj1UsvBio2rqNd3fLo37g0HbLpOjPzRJp21cNishZCZBNAMwWP5ZBVZA01iZCvZC5RD2X4kD6ZAkPYS669EqX9QGsLIixRFWIeOyppHlnLfw1iZBfxElSWcppYPlhWtSZBX8P9OqRD3SGAvuv5aZAOZAyQZDZD'
+      }
+    };
+
+    const chatMain = document.getElementById('chatMain');
+    const input = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const newNumber = document.getElementById('newNumber');
+    const startChat = document.getElementById('startChat');
+    const chatList = document.getElementById('chatList');
+    const chatTitle = document.getElementById('chatTitle');
+
+    let chats = {};
+    let currentChat = null;
+
+    function extractPhoneNumber(redisKey) {
+      if (redisKey.startsWith('conversation:')) {
+        return redisKey.substring(13);
+      }
+      return redisKey;
+    }
+
+    async function scanAllKeys(pattern="conversation*") {
+      let allKeys = [];
+      let cursor = '0';
+      
+      try {
+        do {
+          const url = `${CONFIG.upstash.endpoint}/scan/${cursor}?match=${encodeURIComponent(pattern)}&count=100`;
+          console.log('🔄 Scanning with URL:', url);
+          
+          const res = await fetch(url, {
+            headers: { Authorization: `Bearer ${CONFIG.upstash.token}` }
+          });
+          
+          if (!res.ok) {
+            console.error('❌ Scan failed:', res.status, res.statusText);
+            break;
+          }
+          
+          const json = await res.json();
+          cursor = json.result[0];
+          const keys = json.result[1] || [];
+          
+          console.log(`📊 Found ${keys.length} keys`);
+          allKeys.push(...keys);
+          
+        } while (cursor !== '0');
+      } catch (error) {
+        console.error('❌ Error during scan:', error);
+      }
+      
+      return [...new Set(allKeys)];
+    }
+
+    async function fetchConversation(key) {
+      try {
+        const encodedKey = encodeURIComponent(key);
+        const url = `${CONFIG.upstash.endpoint}/get/${encodedKey}`;
+        
+        console.log('📥 Fetching conversation for key:', key);
+        
+        const res = await fetch(url, {
+          headers: { Authorization: `Bearer ${CONFIG.upstash.token}` }
+        });
+        
+        if (!res.ok) {
+          console.error(`❌ Failed to fetch ${key}:`, res.status, res.statusText);
+          return [];
+        }
+        
+        const json = await res.json();
+        if (!json.result) return [];
+        
+        // Parse the JSON string
+        try {
+          const parsed = JSON.parse(json.result);
+          console.log(`✅ Found ${parsed.length} messages for ${key}`);
+          return parsed;
+        } catch (e) {
+          console.error('❌ Failed to parse JSON:', e);
+          return [];
+        }
+        
+      } catch (error) {
+        console.error(`❌ Error fetching conversation ${key}:`, error);
+        return [];
+      }
+    }
+
+    function getDisplayText(m) {
+      if (!m) return "";
+      
+      // Handle your specific conversation format (role + message)
+      if (m.message && typeof m.message === "string") {
+        return m.message.trim();
+      }
+      
+      // Check for text property
+      if (m.text && typeof m.text === "string") {
+        return m.text.trim();
+      }
+      
+      return "";
+    }
+    
+    function formatSpecialMessage(text) {
+      const t = text.replace(/\*/g, '').trim();
+
+      // Interactive message formatting
+      if (text.includes("📋") || text.includes("🔘")) {
+        return `
+          <div style="background:#2b2b44;padding:12px;border-radius:12px;line-height:1.5;border-left:4px solid #5E185B;">
+            <div style="font-weight:600;color:#5E185B;margin-bottom:6px;">
+              ${text.includes("📋") ? "📋 List Options" : "🔘 Button Options"}
+            </div>
+            <div>${text.replace(/[📋🔘]/g, '').trim()}</div>
+          </div>
+        `;
+      }
+
+      // Proof of payment card
+      if (t.startsWith("💳 PROOF OF PAYMENT RECEIVED")) {
+        return `
+          <div style="background:#2b2b44;padding:12px;border-radius:12px;line-height:1.5;">
+            <div style="font-weight:700;color:#CE3EC0;">💳 Proof of Payment Received</div>
+            <hr style="border:0;border-top:1px solid #444;margin:6px 0;">
+            ${t.replace("💳 PROOF OF PAYMENT RECEIVED", "")
+              .replace(/[*_]/g,'')
+              .replace(/\n/g,'<br>')
+              .replace(/(Order Number:|Customer:|Phone:|Payment Method:)/g, "<strong>$1</strong>")}
+          </div>
+        `;
+      }
+
+      // New cake order card
+      if (t.startsWith("📋 NEW CAKE ORDER")) {
+        return `
+          <div style="background:#2b2b44;padding:12px;border-radius:12px;line-height:1.5;">
+            <div style="font-weight:700;color:#5E185B;">📋 New Cake Order</div>
+            <hr style="border:0;border-top:1px solid #444;margin:6px 0;">
+            ${t.replace("📋 NEW CAKE ORDER", "")
+              .replace(/[*_]/g,'')
+              .replace(/\n/g,'<br>')
+              .replace(/(Order Number:|Customer:|Contact Number:|Email:|Item:|Theme:|Flavor:|Due Date:|Due Time:|Colors:|Message:|Special Requests:|Payment:)/g,
+                "<strong>$1</strong>")}
+          </div>
+        `;
+      }
+
+      // Order Confirmed card
+      if (t.includes("✅ ORDER CONFIRMED ✅")) {
+        return `
+          <div style="background:#2b2b44;padding:12px;border-radius:12px;line-height:1.5;">
+            <div style="font-weight:700;color:#4CAF50;">✅ Order Confirmed</div>
+            <hr style="border:0;border-top:1px solid #444;margin:6px 0;">
+            ${t.replace(/✅ ORDER CONFIRMED ✅/g, "")
+              .replace(/[*_]/g,'')
+              .replace(/\n/g,'<br>')
+              .replace(/(Order Number:|Customer:|Contact Number:|Email:|Item:|Theme:|Flavor:|Due Date:|Due Time:|Colors:|Message:|Special Requests:|Payment:|Total:|Status:)/g,
+                "<strong>$1</strong>")}
+          </div>
+        `;
+      }
+
+      // Order Summary card
+      if (t.includes("🎂 ORDER SUMMARY 🎂")) {
+        return `
+          <div style="background:#2b2b44;padding:12px;border-radius:12px;line-height:1.5;">
+            <div style="font-weight:700;color:#FF9800;">🎂 Order Summary</div>
+            <hr style="border:0;border-top:1px solid #444;margin:6px 0;">
+            ${t.replace(/🎂 ORDER SUMMARY 🎂/g, "")
+              .replace(/[*_]/g,'')
+              .replace(/\n/g,'<br>')
+              .replace(/(Selected Item:|Price:|Name:|Flavor:|Theme:|Due Time:|Colors:|Message:|Special Requests:|Payment:|Note:)/g,
+                "<strong>$1</strong>")}
+          </div>
+        `;
+      }
+
+      return text;
+    }
+
+    function formatTimestamp(timestamp) {
+      if (!timestamp) return "";
+      
+      const date = new Date(timestamp);
+      const now = new Date();
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      if (date.toDateString() === now.toDateString()) {
+        return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      }
+      else if (date.toDateString() === yesterday.toDateString()) {
+        return "Yesterday " + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      }
+      else {
+        return date.toLocaleDateString() + " " + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      }
+    }
+
+    function formatChatTime(timestamp) {
+      if (!timestamp) return "";
+      
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) {
+        return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      } else if (diffDays === 1) {
+        return "Yesterday";
+      } else if (diffDays < 7) {
+        return date.toLocaleDateString([], {weekday: 'short'});
+      } else {
+        return date.toLocaleDateString([], {month: 'short', day: 'numeric'});
+      }
+    }
+
+    async function loadChats() {
+      try {
+        console.log('🚀 Starting to load chats...');
+        
+        // Scan for conversation keys
+        const keys = await scanAllKeys("conversation*");
+        console.log('📊 Conversation keys found:', keys);
+        
+        if (keys.length === 0) {
+          chatList.innerHTML = '<h2>Active Chats</h2><div class="status-message">No conversations found</div>';
+          return;
+        }
+
+        // Clear existing chat list
+        chatList.innerHTML = '<h2>Active Chats</h2>';
+
+        // Fetch each conversation
+        for (const key of keys) {
+          console.log('📥 Loading conversation:', key);
+          const msgs = await fetchConversation(key);
+          if (msgs && msgs.length > 0) {
+            chats[key] = msgs;
+            addChatToList(key, msgs);
+            console.log(`✅ Added ${msgs.length} messages for ${key}`);
+          }
+        }
+        
+        // Select first chat if available
+        const chatItems = document.querySelectorAll('.chat-item');
+        if (chatItems.length > 0) {
+          switchChat(chatItems[0].dataset.chat, chatItems[0]);
+        }
+        
+      } catch (error) {
+        console.error("❌ Error loading chats:", error);
+        chatList.innerHTML = '<h2>Active Chats</h2><div class="status-message">Error loading chats</div>';
+      }
+    }
+
+    function addChatToList(chatId, msgs) {
+      const item = document.createElement('div');
+      item.className = 'chat-item';
+      item.dataset.chat = chatId;
+
+      let preview = "No messages yet";
+      let ts = "";
+
+      if (msgs && msgs.length > 0) {
+        // Get the latest message
+        const lastMsg = msgs[msgs.length - 1];
+        const possiblePreview = getDisplayText(lastMsg);
+        
+        if (possiblePreview && possiblePreview.trim() !== "") {
+          preview = possiblePreview.length > 30 ? possiblePreview.substring(0, 30) + '...' : possiblePreview;
+          ts = lastMsg.timestamp ? formatChatTime(lastMsg.timestamp) : "";
+        }
+      }
+
+      const displayName = extractPhoneNumber(chatId);
+
+      item.innerHTML = `
+        <div class="chat-name">${displayName}</div>
+        <div class="chat-preview">${preview}</div>
+        <div class="chat-time">${ts}</div>
+      `;
+
+      item.addEventListener('click', () => switchChat(chatId, item));
+      chatList.appendChild(item);
+    }
+
+    function renderChat(chatId) {
+      chatMain.innerHTML = '';
+      const msgs = chats[chatId] || [];
+      
+      console.log(`📝 Rendering chat ${chatId} with ${msgs.length} messages:`, msgs);
+      
+      if (msgs.length === 0) {
+        chatMain.innerHTML = '<div class="status-message">No messages in this conversation</div>';
+        return;
+      }
+
+      let lastDate = null;
+      
+      msgs.forEach(m => {
+        const text = getDisplayText(m);
+        
+        if (!text) {
+          console.log('⚠️ Skipping message with no text:', m);
+          return;
+        }
+        
+        // Determine if it's user or bot message
+        const isUser = m.role === "user";
+        const cls = isUser ? "user" : "bot";
+        
+        const timestamp = m.timestamp || Date.now();
+        const messageDate = new Date(timestamp).toDateString();
+        
+        // Add date dividers
+        if (lastDate !== messageDate) {
+          const dateDivider = document.createElement('div');
+          dateDivider.className = 'date-divider';
+          
+          const now = new Date();
+          const today = now.toDateString();
+          const yesterday = new Date(now);
+          yesterday.setDate(yesterday.getDate() - 1);
+          
+          let displayDate;
+          if (messageDate === today) displayDate = "Today";
+          else if (messageDate === yesterday.toDateString()) displayDate = "Yesterday";
+          else displayDate = new Date(timestamp).toLocaleDateString([], {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+          
+          dateDivider.textContent = displayDate;
+          chatMain.appendChild(dateDivider);
+          lastDate = messageDate;
+        }
+        
+        // Create message element
+        const div = document.createElement('div');
+        div.className = 'message ' + cls;
+        
+        const formatted = formatSpecialMessage(text);
+        const timeDisplay = formatTimestamp(timestamp);
+        
+        div.innerHTML = `${formatted}<div class="message-status" style="text-align: ${cls === 'bot' ? 'right' : 'left'}; color: #999; font-size: 11px; margin-top: 4px;">${timeDisplay}</div>`;
+        
+        chatMain.appendChild(div);
+      });
+      
+      chatTitle.textContent = `Chat: ${extractPhoneNumber(chatId)}`;
+      chatMain.scrollTop = chatMain.scrollHeight;
+    }
+
+    function switchChat(chatId, item) {
+      document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
+      item.classList.add('active');
+      currentChat = chatId;
+      renderChat(chatId);
+    }
+
+    function formatPhoneNumber(number) {
+      let cleaned = number.replace(/\D/g, '');
+      if (cleaned.startsWith('0')) cleaned = '263' + cleaned.substring(1);
+      if (!cleaned.startsWith('263') && cleaned.length === 10) cleaned = '263' + cleaned;
+      return cleaned;
+    }
+
+    sendBtn.addEventListener('click', async () => {
+      const v = input.value.trim();
+      if (!v || !currentChat) return;
+
+      const phoneNumber = extractPhoneNumber(currentChat);
+      
+      const messageObj = {
+        role: 'bot',
+        message: v,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Add to UI
+      const div = document.createElement('div');
+      div.className = 'message bot';
+      div.innerHTML = `${v}<div class="message-status" style="text-align: right; color: #999; font-size: 11px; margin-top: 4px;">Sending...</div>`;
+      chatMain.appendChild(div);
+      chatMain.scrollTop = chatMain.scrollHeight;
+      input.value = '';
+
+      try {
+        const formattedTo = formatPhoneNumber(phoneNumber);
+        const url = `https://graph.facebook.com/${CONFIG.whatsapp.apiVersion}/${CONFIG.whatsapp.phoneNumberId}/messages`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${CONFIG.whatsapp.accessToken}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
+            to: formattedTo,
+            type: "text",
+            text: { body: v }
+          })
+        });
+
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.message);
+        
+        // Update status
+        const lastMessage = chatMain.querySelector('.message.bot:last-child .message-status');
+        if (lastMessage) {
+          lastMessage.textContent = `✓ Sent • ${formatTimestamp(Date.now())}`;
+        }
+
+        // Get existing messages
+        let existingMessages = chats[currentChat] || [];
+        
+        // Add new message
+        existingMessages.push(messageObj);
+        
+        // Save back to Upstash as JSON string
+        const encodedKey = encodeURIComponent(currentChat);
+        await fetch(`${CONFIG.upstash.endpoint}/set/${encodedKey}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${CONFIG.upstash.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(JSON.stringify(existingMessages))
+        });
+
+        // Update chats array
+        chats[currentChat] = existingMessages;
+        
+        // Update chat preview
+        updateChatPreview(currentChat, v);
+
+      } catch (err) {
+        console.error("Failed to send WhatsApp message:", err);
+        const lastMessage = chatMain.querySelector('.message.bot:last-child .message-status');
+        if (lastMessage) {
+          lastMessage.textContent = `Failed to send • ${formatTimestamp(Date.now())}`;
+          lastMessage.style.color = '#F44336';
+        }
+      }
+    });
+
+    function updateChatPreview(chatId, text) {
+      const item = document.querySelector(`.chat-item[data-chat="${chatId}"]`);
+      if (item) {
+        const preview = text.length > 30 ? text.substring(0, 30) + '...' : text;
+        item.querySelector('.chat-preview').textContent = preview;
+        item.querySelector('.chat-time').textContent = formatChatTime(Date.now());
+      }
+    }
+
+    startChat.addEventListener('click', () => {
+      const number = newNumber.value.trim();
+      if (!number) return alert('Enter a number');
+      const conversationKey = `conversation:${number}`;
+      
+      if (!chats[conversationKey]) {
+        const welcomeMsg = {
+          role: 'bot',
+          message: `New chat started with ${number}`,
+          timestamp: new Date().toISOString()
+        };
+        chats[conversationKey] = [welcomeMsg];
+        addChatToList(conversationKey, chats[conversationKey]);
+        
+        // Save to Upstash as JSON string
+        const encodedKey = encodeURIComponent(conversationKey);
+        fetch(`${CONFIG.upstash.endpoint}/set/${encodedKey}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${CONFIG.upstash.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(JSON.stringify([welcomeMsg]))
+        });
+        
+        const newItem = document.querySelector(`.chat-item[data-chat="${conversationKey}"]`);
+        if (newItem) switchChat(conversationKey, newItem);
+      } else {
+        const item = document.querySelector(`.chat-item[data-chat="${conversationKey}"]`);
+        if (item) switchChat(conversationKey, item);
+      }
+      newNumber.value = '';
+    });
+
+    input.addEventListener('keypress', (e) => { 
+      if (e.key === 'Enter') sendBtn.click(); 
+    });
+
+    // Load chats when page loads
+    loadChats();
+  </script>
+
+</body>
+</html>

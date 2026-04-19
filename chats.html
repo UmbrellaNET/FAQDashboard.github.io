@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>UmbrellaNet – Live Agent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #1c1a2e;
+            --primary: #5E185B;
+            --accent: #CE3EC0;
+            --secondary: #32c245;
+            --muted: #2b2b44;
+            --text: #f1e6f9;
+            --card: #2a2740;
+            --border: #333;
+            --danger: #ff6464;
+            --success-bg: rgba(9,241,40,0.08);
+            --danger-bg: rgba(255,100,100,0.08);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 240px;
+            background: var(--card);
+            padding: 20px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .logo-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .brand h1 {
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .brand small {
+            font-size: 11px;
+            color: #aaa;
+            display: block;
+        }
+
+        .nav a {
+            color: var(--text);
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: 8px;
+            display: block;
+            font-size: 14px;
+        }
+
+            .nav a:hover {
+                background: var(--muted);
+            }
+
+            .nav a.active {
+                background: var(--primary);
+                color: white;
+            }
+
+        /* ── MAIN ── */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .topbar {
+            height: 60px;
+            background: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .topbar-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-online {
+            background: rgba(50,194,69,0.15);
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+        }
+
+        .badge-offline {
+            background: rgba(255,100,100,0.12);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .badge-waiting {
+            background: rgba(206,62,192,0.15);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        /* ── AGENT VIEW ── */
+        #agent-view {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .agent-layout {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Agent login */
+        #agent-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 40px;
+        }
+
+        .login-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 380px;
+        }
+
+            .login-card h2 {
+                font-size: 22px;
+                font-weight: 700;
+                margin-bottom: 6px;
+                color: var(--accent);
+            }
+
+            .login-card p {
+                font-size: 13px;
+                color: #999;
+                margin-bottom: 28px;
+            }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+            .form-group label {
+                font-size: 13px;
+                color: #ccc;
+            }
+
+        .form-input {
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+        }
+
+            .form-input:focus {
+                border-color: var(--accent);
+            }
+
+        .login-btn {
+            width: 100%;
+            background: var(--primary);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+
+            .login-btn:hover {
+                background: var(--accent);
+            }
+
+        .login-error {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 8px;
+            min-height: 18px;
+        }
+
+        /* Queue panel */
+        .queue-panel {
+            width: 300px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .queue-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .queue-count {
+            background: var(--accent);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+        }
+
+        .queue-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .queue-item {
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: border-color 0.15s;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+            .queue-item:hover {
+                border-color: var(--accent);
+            }
+
+            .queue-item.active {
+                border-color: var(--accent);
+                background: rgba(206,62,192,0.08);
+            }
+
+        .queue-item-name {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .queue-item-preview {
+            font-size: 12px;
+            color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .queue-item-meta {
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Accept / Deny buttons */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .accept-btn {
+            background: var(--secondary);
+            border: none;
+            border-radius: 8px;
+            padding: 5px 14px;
+            color: #111;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            flex: 1;
+        }
+
+            .accept-btn:hover {
+                opacity: 0.85;
+            }
+
+        .deny-btn {
+            background: transparent;
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 5px 14px;
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex: 1;
+        }
+
+            .deny-btn:hover {
+                background: var(--danger-bg);
+            }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-wait {
+            background: var(--accent);
+            animation: pulse 1.5s infinite;
+        }
+
+        .dot-active {
+            background: var(--secondary);
+        }
+
+        @keyframes pulse {
+            0%,100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* Status bar */
+        .agent-status-bar {
+            padding: 10px 20px;
+            background: var(--muted);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            color: var(--danger);
+            padding: 4px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+            .logout-btn:hover {
+                background: var(--danger-bg);
+            }
+
+        /* Agent chat area */
+        .agent-chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .no-chat-selected {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+            color: #666;
+        }
+
+            .no-chat-selected .icon {
+                font-size: 48px;
+            }
+
+        .chat-header {
+            padding: 16px 24px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
+        }
+
+        .msg-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+            .msg-row.agent-out {
+                flex-direction: row-reverse;
+            }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .avatar-agent {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+        }
+
+        .avatar-user {
+            background: var(--muted);
+            border: 1px solid var(--border);
+        }
+
+        .bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .bubble-agent {
+            background: var(--primary);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bubble-user {
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .bubble-system {
+            background: transparent;
+            border: 1px dashed var(--accent);
+            color: var(--accent);
+            font-size: 12px;
+            text-align: center;
+            margin: 0 auto;
+            border-radius: 20px;
+            padding: 6px 16px;
+        }
+
+        .msg-time {
+            font-size: 10px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .chat-input-area {
+            padding: 16px 24px;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            min-height: 42px;
+            max-height: 120px;
+        }
+
+            .chat-input:focus {
+                border-color: var(--accent);
+            }
+
+        .send-btn {
+            background: var(--primary);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 18px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+            .send-btn:hover {
+                background: var(--accent);
+            }
+
+        .end-btn {
+            background: transparent;
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+            .end-btn:hover {
+                background: var(--danger-bg);
+            }
+
+        /* Transfer hint */
+        .transfer-hint {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            padding: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 2px 0;
+        }
+
+            .typing-indicator span {
+                width: 7px;
+                height: 7px;
+                background: #888;
+                border-radius: 50%;
+                animation: bounce 1.2s infinite;
+            }
+
+                .typing-indicator span:nth-child(2) {
+                    animation-delay: 0.2s;
+                }
+
+                .typing-indicator span:nth-child(3) {
+                    animation-delay: 0.4s;
+                }
+
+        @keyframes bounce {
+            0%,60%,100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Incoming request toast */
+        #incoming-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: var(--card);
+            border: 1px solid var(--accent);
+            border-radius: 14px;
+            padding: 18px 20px;
+            width: 300px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+            #incoming-toast.show {
+                display: flex;
+            }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast-user {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .toast-preview {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .toast-timer {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .toast-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toast-accept {
+            flex: 1;
+            background: var(--secondary);
+            border: none;
+            border-radius: 8px;
+            padding: 8px;
+            color: #111;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .toast-deny {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 8px;
+            color: var(--danger);
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+            .toast-deny:hover {
+                background: var(--danger-bg);
+            }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--muted);
+            border-radius: 3px;
+        }
+
+        @media (max-width: 1000px) {
+            .sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .queue-panel {
+                width: 240px;
+            }
+
+            .bubble {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-box">🌐</div>
+            <div>
+                <h1>UmbrellaNet</h1>
+                <small>Live Support</small>
+            </div>
+        </div>
+        <nav class="nav">
+            <a href="chats.html">Chats</a>
+            <a href="analytics.html">Analytics</a>
+            <a href="index2.html">Dashboard</a>
+            <a href="live-agent.html" class="active">🎧 Live Agent</a>
+        </nav>
+    </aside>
+
+    <!-- INCOMING CHAT TOAST -->
+    <div id="incoming-toast">
+        <div class="toast-title">🔔 Incoming Chat Request</div>
+        <div class="toast-user" id="toast-user-name">User</div>
+        <div class="toast-preview" id="toast-preview">Wants to speak with an agent</div>
+        <div class="toast-timer" id="toast-timer">Expires in 30s…</div>
+        <div class="toast-actions">
+            <button class="toast-accept" onclick="agentAcceptTransfer()">✅ Accept</button>
+            <button class="toast-deny" onclick="agentDenyTransfer()">✗ Deny</button>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="topbar">
+            <div class="topbar-title">🎧 Live Agent Support</div>
+            <div id="topbar-status" class="badge badge-offline">● Offline</div>
+        </div>
+
+        <!-- AGENT VIEW -->
+        <div id="agent-view">
+
+            <!-- Login -->
+            <div id="agent-login" style="display:flex;align-items:center;justify-content:center;flex:1;padding:40px">
+                <div class="login-card">
+                    <h2>Agent Login</h2>
+                    <p>Sign in to start handling live chats</p>
+                    <div class="form-group">
+                        <label>Agent Name</label>
+                        <input class="form-input" id="agent-name-input" placeholder="e.g. Sarah" maxlength="40"
+                               onkeydown="if(event.key==='Enter')agentLogin()">
+                    </div>
+                    <div class="form-group">
+                        <label>Access Code</label>
+                        <input class="form-input" type="password" id="agent-code-input" placeholder="Enter code"
+                               onkeydown="if(event.key==='Enter')agentLogin()">
+                    </div>
+                    <button class="login-btn" onclick="agentLogin()">Login →</button>
+                    <div class="login-error" id="agent-login-error"></div>
+                    <div style="font-size:11px;color:#555;margin-top:16px;text-align:center">Demo code: <span style="color:var(--accent);font-family:monospace">agent123</span></div>
+                </div>
+            </div>
+
+            <!-- Agent dashboard -->
+            <div id="agent-dashboard" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+                <div class="agent-status-bar">
+                    <div>
+                        <span style="color:var(--secondary);font-weight:600" id="agent-name-display">Agent</span>
+                        <span style="color:#666"> — Online &amp; Available</span>
+                    </div>
+                    <button class="logout-btn" onclick="agentLogout()">Log Out</button>
+                </div>
+                <div class="agent-layout" style="flex:1;overflow:hidden">
+
+                    <!-- Queue panel -->
+                    <div class="queue-panel">
+                        <div class="queue-header">
+                            <span>Chat Queue</span>
+                            <span class="queue-count" id="queue-count">0</span>
+                        </div>
+                        <div class="queue-list" id="queue-list">
+                            <div style="color:#666;font-size:13px;text-align:center;padding:20px">No chats waiting</div>
+                        </div>
+                    </div>
+
+                    <!-- Agent chat area -->
+                    <div class="agent-chat-area">
+                        <div class="no-chat-selected" id="no-chat-msg">
+                            <div class="icon">🎧</div>
+                            <div style="font-size:16px;font-weight:600">No chat selected</div>
+                            <div style="font-size:13px;color:#666">Waiting for incoming transfer requests</div>
+                        </div>
+                        <div id="agent-active-chat" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+                            <div class="chat-header">
+                                <div>
+                                    <div style="font-weight:700;font-size:15px" id="agent-chat-user-label">User</div>
+                                    <div style="font-size:12px;color:#aaa" id="agent-chat-sublabel">Active session</div>
+                                </div>
+                                <div style="display:flex;gap:8px;align-items:center">
+                                    <span class="badge badge-online">● Live</span>
+                                    <button class="end-btn" onclick="agentEndSession()">End Chat</button>
+                                </div>
+                            </div>
+                            <div class="chat-body" id="agent-chat-body"></div>
+                            <div class="chat-input-area">
+                                <textarea class="chat-input" id="agent-input"
+                                          placeholder="Type a message to the user…"
+                                          rows="1"
+                                          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();agentSend();}"></textarea>
+                                <button class="send-btn" onclick="agentSend()">Send</button>
+                            </div>
+                            <div class="transfer-hint">Click <strong>End Chat</strong> to close the session and return the user to the bot.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div><!-- /agent-view -->
+    </div><!-- /main -->
+
+    <script>
+        /*
+         * ARCHITECTURE
+         * ─────────────────────────────────────────────────────────────
+         * Uses BroadcastChannel (shared across all tabs of the same origin)
+         * as a real-time message bus between index.html (chatbot) and
+         * this agent dashboard.
+         *
+         * Channel: "umbrellanet_livechat"
+         *
+         * Message types (inbound from index.html):
+         *   TRANSFER_REQUEST   – user asked to speak to an agent; includes userId, userName, lastMessage
+         *   USER_MSG           – user sent a message while connected to agent
+         *   USER_DISCONNECT    – user closed the chat window
+         *
+         * Message types (outbound to index.html):
+         *   AGENT_ACCEPT       – agent accepted the transfer; includes agentName
+         *   AGENT_DENY         – agent denied / is unavailable
+         *   AGENT_MSG          – agent sent a message to the user
+         *   AGENT_EXIT         – agent ended the session (user transferred back to bot)
+         *   AGENT_ONLINE       – heartbeat so index.html can know an agent is available
+         *   AGENT_OFFLINE      – agent logged out
+         * ─────────────────────────────────────────────────────────────
+         */
+
+        const CHANNEL = 'umbrellanet_livechat';
+        const AGENT_CODE = 'agent123';
+        const bc = new BroadcastChannel(CHANNEL);
+
+        /* ── STATE ── */
+        let agentName = null;
+        let myId = 'agent_' + Math.random().toString(36).slice(2, 8);
+        let activeUserId = null;
+        let pendingUserId = null;   // userId of the incoming transfer currently shown in toast
+        let toastTimer = null;   // countdown interval handle
+        let queue = {};     // { userId: { name, messages[], accepted } }
+
+        /* ── UTILITIES ── */
+        const now = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const escHtml = str => String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+        function send(msg) { bc.postMessage(msg); }
+
+        /* ─────────────────────────────────────────────
+           LOGIN / LOGOUT
+        ───────────────────────────────────────────── */
+        function agentLogin() {
+            const name = document.getElementById('agent-name-input').value.trim();
+            const code = document.getElementById('agent-code-input').value.trim();
+            const err = document.getElementById('agent-login-error');
+
+            if (!name) { err.textContent = 'Please enter your agent name.'; return; }
+            if (code !== AGENT_CODE) { err.textContent = 'Invalid access code.'; return; }
+
+            agentName = name;
+            document.getElementById('agent-login').style.display = 'none';
+            const dash = document.getElementById('agent-dashboard');
+            dash.style.display = 'flex';
+            dash.style.flexDirection = 'column';
+            document.getElementById('agent-name-display').textContent = agentName;
+            document.getElementById('topbar-status').className = 'badge badge-online';
+            document.getElementById('topbar-status').textContent = '● Online';
+
+            // Announce presence so index.html knows agent is available
+            send({ type: 'AGENT_ONLINE', agentId: myId, agentName });
+        }
+
+        function agentLogout() {
+            if (activeUserId) agentEndSession(true);
+            agentName = null; activeUserId = null; pendingUserId = null; queue = {};
+            dismissToast();
+            document.getElementById('agent-dashboard').style.display = 'none';
+            document.getElementById('agent-login').style.display = 'flex';
+            document.getElementById('topbar-status').className = 'badge badge-offline';
+            document.getElementById('topbar-status').textContent = '● Offline';
+            renderQueue();
+            send({ type: 'AGENT_OFFLINE', agentId: myId });
+        }
+
+        /* ─────────────────────────────────────────────
+           INCOMING TRANSFER TOAST
+        ───────────────────────────────────────────── */
+        function showTransferToast(userId, userName, preview) {
+            // If already handling one pending, auto-deny it first
+            if (pendingUserId && pendingUserId !== userId) {
+                agentDenyTransfer();
+            }
+
+            pendingUserId = userId;
+            document.getElementById('toast-user-name').textContent = userName;
+            document.getElementById('toast-preview').textContent = preview || 'Wants to speak with an agent';
+            document.getElementById('incoming-toast').classList.add('show');
+
+            // Flash page title
+            document.title = `(!) Transfer Request — UmbrellaNet`;
+            setTimeout(() => { if (agentName) document.title = 'UmbrellaNet – Live Agent'; }, 4000);
+
+            // 30-second auto-deny countdown
+            let secs = 30;
+            document.getElementById('toast-timer').textContent = `Auto-deny in ${secs}s`;
+            clearInterval(toastTimer);
+            toastTimer = setInterval(() => {
+                secs--;
+                if (secs <= 0) {
+                    clearInterval(toastTimer);
+                    agentDenyTransfer();
+                } else {
+                    document.getElementById('toast-timer').textContent = `Auto-deny in ${secs}s`;
+                }
+            }, 1000);
+        }
+
+        function dismissToast() {
+            clearInterval(toastTimer);
+            document.getElementById('incoming-toast').classList.remove('show');
+            pendingUserId = null;
+        }
+
+        function agentAcceptTransfer() {
+            if (!pendingUserId) return;
+            const userId = pendingUserId;
+            const userData = queue[userId];
+            dismissToast();
+
+            // Mark as accepted
+            if (userData) userData.accepted = true;
+
+            // Notify user
+            send({ type: 'AGENT_ACCEPT', agentId: myId, agentName, userId });
+
+            // Open chat window
+            activeUserId = userId;
+            renderQueue();
+            openAgentChat(userId);
+        }
+
+        function agentDenyTransfer() {
+            if (!pendingUserId) return;
+            const userId = pendingUserId;
+            dismissToast();
+
+            // Notify user that no agent is available
+            send({ type: 'AGENT_DENY', agentId: myId, userId });
+
+            // Remove from queue
+            if (queue[userId]) delete queue[userId];
+            renderQueue();
+        }
+
+        /* ─────────────────────────────────────────────
+           ACTIVE CHAT
+        ───────────────────────────────────────────── */
+        function openAgentChat(userId) {
+            document.getElementById('no-chat-msg').style.display = 'none';
+            const ac = document.getElementById('agent-active-chat');
+            ac.style.display = 'flex';
+            ac.style.flexDirection = 'column';
+
+            const uName = queue[userId]?.name || 'User';
+            document.getElementById('agent-chat-user-label').textContent = `💬 ${uName}`;
+            document.getElementById('agent-chat-sublabel').textContent = 'Active live session';
+            document.getElementById('agent-chat-body').innerHTML = '';
+
+            // Replay any messages that arrived before accept
+            (queue[userId]?.messages || []).forEach(m => appendAgentMsg(m));
+
+            // Welcome system note
+            appendAgentMsg({ type: 'system', text: `✅ You accepted ${uName}'s chat. Say hello!` });
+        }
+
+        function closeAgentChat() {
+            document.getElementById('agent-active-chat').style.display = 'none';
+            document.getElementById('no-chat-msg').style.display = 'flex';
+        }
+
+        function agentSend() {
+            const input = document.getElementById('agent-input');
+            const text = input.value.trim();
+            if (!text || !activeUserId) return;
+            input.value = '';
+
+            const t = now();
+            appendAgentMsg({ type: 'agent', text, time: t });
+            send({ type: 'AGENT_MSG', agentId: myId, agentName, userId: activeUserId, text, time: t });
+        }
+
+        function agentEndSession(silent = false) {
+            if (!silent && activeUserId) {
+                send({ type: 'AGENT_EXIT', agentId: myId, agentName, userId: activeUserId });
+                appendAgentMsg({ type: 'system', text: '🔄 Session ended. User transferred back to bot.' });
+            }
+            if (queue[activeUserId]) delete queue[activeUserId];
+            activeUserId = null;
+            closeAgentChat();
+            renderQueue();
+        }
+
+        function appendAgentMsg({ type, text, time }) {
+            const body = document.getElementById('agent-chat-body');
+            const row = document.createElement('div');
+
+            if (type === 'system') {
+                row.style.cssText = 'display:flex;justify-content:center;width:100%';
+                row.innerHTML = `<div class="bubble bubble-system">${text}</div>`;
+            } else if (type === 'user') {
+                row.className = 'msg-row';
+                row.innerHTML = `
+            <div class="avatar avatar-user">👤</div>
+            <div>
+              <div class="bubble bubble-user">${escHtml(text)}</div>
+              <div class="msg-time">${time || ''}</div>
+            </div>`;
+            } else if (type === 'agent') {
+                row.className = 'msg-row agent-out';
+                row.innerHTML = `
+            <div>
+              <div class="bubble bubble-agent">${escHtml(text)}</div>
+              <div class="msg-time" style="text-align:right">${time || ''}</div>
+            </div>
+            <div class="avatar avatar-agent">🎧</div>`;
+            }
+
+            body.appendChild(row);
+            body.scrollTop = body.scrollHeight;
+        }
+
+        /* ─────────────────────────────────────────────
+           QUEUE RENDER
+        ───────────────────────────────────────────── */
+        function renderQueue() {
+            const list = document.getElementById('queue-list');
+            const waiting = Object.entries(queue).filter(([, v]) => !v.accepted);
+            const active = Object.entries(queue).filter(([, v]) => v.accepted);
+            document.getElementById('queue-count').textContent = Object.keys(queue).length;
+
+            if (!Object.keys(queue).length) {
+                list.innerHTML = '<div style="color:#666;font-size:13px;text-align:center;padding:20px">No active chats</div>';
+                return;
+            }
+
+            list.innerHTML = '';
+
+            const header = (label, mt) => {
+                const h = document.createElement('div');
+                h.style.cssText = `font-size:11px;color:#888;padding:4px 6px;text-transform:uppercase;letter-spacing:.5px${mt ? ';margin-top:8px' : ''}`;
+                h.textContent = label;
+                list.appendChild(h);
+            };
+
+            if (waiting.length) {
+                header('Pending', false);
+                waiting.forEach(([id, data]) => {
+                    const item = document.createElement('div');
+                    item.className = 'queue-item';
+                    const last = data.messages?.length ? data.messages[data.messages.length - 1] : null;
+                    item.innerHTML = `
+              <div class="queue-item-name"><span class="dot dot-wait"></span>${escHtml(data.name)}</div>
+              <div class="queue-item-preview">${last ? escHtml(last.text) : 'Waiting for agent…'}</div>
+              <div class="queue-item-meta"><span>Pending transfer</span><span>${last?.time || ''}</span></div>`;
+                    list.appendChild(item);
+                });
+            }
+
+            if (active.length) {
+                header('Active', waiting.length > 0);
+                active.forEach(([id, data]) => {
+                    const item = document.createElement('div');
+                    item.className = 'queue-item' + (id === activeUserId ? ' active' : '');
+                    item.onclick = () => { if (id !== activeUserId) { activeUserId = id; openAgentChat(id); renderQueue(); } };
+                    const last = data.messages?.length ? data.messages[data.messages.length - 1] : null;
+                    item.innerHTML = `
+              <div class="queue-item-name"><span class="dot dot-active"></span>${escHtml(data.name)}</div>
+              <div class="queue-item-preview">${last ? escHtml(last.text) : 'No messages yet'}</div>
+              <div class="queue-item-meta"><span>Live with you</span><span>${last?.time || ''}</span></div>`;
+                    list.appendChild(item);
+                });
+            }
+        }
+
+        /* ─────────────────────────────────────────────
+           BROADCAST CHANNEL HANDLER
+        ───────────────────────────────────────────── */
+        bc.onmessage = (e) => {
+            const msg = e.data;
+
+            // Only process if agent is logged in
+            if (!agentName) return;
+
+            // ── Incoming transfer request from index.html ──
+            if (msg.type === 'TRANSFER_REQUEST') {
+                if (!queue[msg.userId]) {
+                    queue[msg.userId] = { name: msg.userName, messages: [], accepted: false };
+                }
+                renderQueue();
+                showTransferToast(msg.userId, msg.userName, msg.lastMessage);
+            }
+
+            // ── User sent a message ──
+            if (msg.type === 'USER_MSG' && queue[msg.userId]) {
+                const m = { type: 'user', text: msg.text, time: msg.time };
+                queue[msg.userId].messages.push(m);
+                if (msg.userId === activeUserId) appendAgentMsg(m);
+                renderQueue();
+            }
+
+            // ── User disconnected / closed the chat ──
+            if (msg.type === 'USER_DISCONNECT' && msg.userId === activeUserId) {
+                appendAgentMsg({ type: 'system', text: '⚠️ The user has left the chat.' });
+                if (queue[activeUserId]) delete queue[activeUserId];
+                activeUserId = null;
+                setTimeout(closeAgentChat, 1500);
+                renderQueue();
+            }
+        };
+
+        // Announce online status periodically so index.html can detect availability
+        setInterval(() => {
+            if (agentName) send({ type: 'AGENT_ONLINE', agentId: myId, agentName });
+        }, 15000);
+    </script>
+</body>
+</html>

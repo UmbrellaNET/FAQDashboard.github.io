@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UmbrellaNet - Analytics</title>
+
+  <!-- Site favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo.svg">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo.svg">
+
+	<!-- Mobile Specific Metas -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- Google Font -->
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+	<!-- CSS -->
+	<link rel="stylesheet" type="text/css" href="css/core.css">
+	<link rel="stylesheet" type="text/css" href="css/icon-font.min.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+  <!-- Firebase SDK -->
+	<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics-compat.js"></script>
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-119386393-1"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg:#1c1a2e;
+      --primary:#5E185B;
+      --accent:#CE3EC0;
+      --secondary:#32c245;
+      --muted:#2b2b44;
+      --text:#f1e6f9;
+      --card:#2a2740;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; background:var(--bg); color:var(--text); display:flex;}
+    
+    .sidebar{width:240px;background:var(--card);padding:20px;height:100vh;position:sticky;top:0;border-right:1px solid #333}
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:20px}
+    .logo{width:48px;height:48px;border-radius:12px;;display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+    .brand h1{font-size:18px;margin:0}
+    .nav{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .nav a{color:var(--text);text-decoration:none;padding:10px;border-radius:8px}
+    .nav a:hover{background:var(--muted)}
+    .nav a.active{background:var(--primary);color:white}
+    
+    .main{flex:1;display:flex;flex-direction:column;height:100vh}
+    .topbar{height:60px;background:var(--card);display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #333}
+    .container{flex:1;overflow-y:auto;color: white;max-width:1200px;margin:0 auto;padding:20px;width:100%}
+    
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:20px}
+    .card{background:var(--card);padding:20px;border-radius:12px;text-align:center;border:1px solid #333}
+    .card h3{margin:0;font-size:14px;color:#ccc}
+    .card .value{font-size:32px;font-weight:bold;margin-top:8px;color:var(--accent)}
+    .card .subtitle{font-size:12px;color:#888;margin-top:4px}
+    
+    .chart-container{margin-top:30px;background:var(--card);padding:20px;border-radius:12px;border:1px solid #333}
+
+    /* Static chart wrapper — fixed height, no resize jumping */
+    .chart-wrapper{position:relative;width:100%;height:320px;}
+    .chart-wrapper canvas{position:absolute;top:0;left:0;width:100%!important;height:100%!important;}
+
+    .date-filter-container{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    select,input{padding:8px 12px;border-radius:8px;border:1px solid #353042;background:transparent;color:var(--text)}
+    button{padding:8px 16px;border-radius:8px;border:none;background:var(--primary);color:white;cursor:pointer;transition:opacity 0.2s}
+    button:hover{opacity:0.9}
+    button.secondary{background:transparent;border:1px solid var(--primary)}
+    
+    .loading{display:flex;justify-content:center;align-items:center;height:200px}
+    .loading-spinner{width:40px;height:40px;border:4px solid rgba(255,255,255,0.1);border-radius:50%;border-top:4px solid var(--accent);animation:spin 1s linear infinite}
+    @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg)}}
+    
+    .muted{color:#888;font-size:13px}
+    .status{margin-top:10px;padding:10px;border-radius:8px;display:none}
+    .success{background:rgba(9,241,40,0.1);border:1px solid var(--accent);color:var(--accent)}
+    .error{background:rgba(255,100,100,0.1);border:1px solid #ff6464;color:#ff6464}
+    
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px}
+    .stat-item{background:var(--card);padding:15px;border-radius:8px;border-left:3px solid var(--accent)}
+    .stat-label{font-size:13px;color:#888}
+    .stat-value{font-size:20px;font-weight:bold;color:var(--text)}
+    
+    .insights-panel{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .insight-card{background:var(--card);padding:15px;border-radius:8px;border:1px solid #333}
+    .insight-title{font-size:14px;color:#ccc;margin-bottom:10px}
+    .insight-list{list-style:none;padding:0;margin:0}
+    .insight-list li{padding:8px 0;border-bottom:1px solid #333;display:flex;justify-content:space-between}
+    .insight-list li:last-child{border-bottom:none}
+    
+    .logo-img{width:60px;height:60px;object-fit:contain}
+    
+    @media (max-width:1000px){.sidebar{display:none}}
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <img src="img/logo.svg" alt="" class="logo-img">
+      </div>
+      <div>
+        <h1 style="color: #fff;">UmbrellaNet</h1>
+        <div style="font-size:12px; color:white">Admin Dashboard</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="chats.html">Chats</a>
+      <a href="analytics.html" class="active">Analytics</a>
+      
+      <a href="index2.html">Dashboard</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div>📊 Analytics Dashboard</div>
+      <div class="muted">Admin User • <span id="lastUpdated">Last updated: -</span></div>
+    </div>
+
+    <div class="container">
+      <h1 style="color: #5E185B;">Chatbot Performance Analytics</h1>
+      <div class="muted">Real-time insights into user interactions and engagement</div>
+
+      <div id="connectionStatus" class="status success">✅ Successfully connected to database</div>
+      <div id="errorStatus" class="status error"></div>
+
+      <!-- Key Metrics Cards -->
+      <div class="cards">
+        <div class="card">
+          <h3>👥 Total Users</h3>
+          <div class="value" id="totalUsers">0</div>
+          <div class="subtitle">Unique phone numbers</div>
+        </div>
+        <div class="card">
+          <h3>📱 Active Users (30d)</h3>
+          <div class="value" id="activeUsers">0</div>
+          <div class="subtitle">Last 30 days</div>
+        </div>
+        <div class="card">
+          <h3>💬 Conversations</h3>
+          <div class="value" id="conversations">0</div>
+          <div class="subtitle">In selected range</div>
+        </div>
+        <div class="card">
+          <h3>📨 Total Messages</h3>
+          <div class="value" id="totalMessages">0</div>
+          <div class="subtitle">All messages</div>
+        </div>
+      </div>
+
+      <!-- Second Row Metrics -->
+      <div class="cards" style="margin-top:10px">
+        <div class="card">
+          <h3>📊 Avg. Messages/Conversation</h3>
+          <div class="value" id="avgMessages">0</div>
+          <div class="subtitle">Message density</div>
+        </div>
+        <div class="card">
+          <h3>👤 New Users</h3>
+          <div class="value" id="newUsers">0</div>
+          <div class="subtitle">In selected range</div>
+        </div>
+        <div class="card">
+          <h3>🔄 User Retention</h3>
+          <div class="value" id="retention">0%</div>
+          <div class="subtitle">Returning users</div>
+        </div>
+        <div class="card">
+          <h3>⏱️ Response Rate</h3>
+          <div class="value" id="responseRate">0%</div>
+          <div class="subtitle">Bot responses</div>
+        </div>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="chart-container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+          <h3 style="color: #fff;margin:0">📈 User Interactions Over Time</h3>
+          <div class="date-filter-container">
+            <input type="date" id="startDate">
+            <span class="muted">to</span>
+            <input type="date" id="endDate">
+            <button id="applyDateFilter">Apply Filter</button>
+            <button id="refreshBtn" class="secondary">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <div id="loadingChart" class="loading" style="display:none">
+          <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Static-size chart wrapper -->
+        <div class="chart-wrapper">
+          <canvas id="barChart" style="display:none;"></canvas>
+        </div>
+      </div>
+
+      <!-- Insights Panel -->
+      <div class="insights-panel">
+        <div class="insight-card">
+          <div class="insight-title">🔥 Top Active Users</div>
+          <ul class="insight-list" id="topUsers">
+            <li>Loading...</li>
+          </ul>
+        </div>
+        <div class="insight-card">
+          <div class="insight-title">📊 Message Distribution</div>
+          <ul class="insight-list" id="messageStats">
+            <li>Loading...</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Your Upstash configuration
+    const REDIS_URL = "https://oriented-gibbon-64178.upstash.io";
+    const REDIS_TOKEN = "AfqyAAIncDI4M2Y5OTViZTBjNmE0NzdmODE0MWJkNzIzZDgwZDlkZXAyNjQxNzg";
+
+    const ctx = document.getElementById('barChart').getContext('2d');
+    const startDateElem = document.getElementById('startDate');
+    const endDateElem = document.getElementById('endDate');
+    const applyFilterBtn = document.getElementById('applyDateFilter');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const loadingElem = document.getElementById('loadingChart');
+    const chartCanvas = document.getElementById('barChart');
+    const connectionStatus = document.getElementById('connectionStatus');
+    const errorStatus = document.getElementById('errorStatus');
+    const lastUpdatedElem = document.getElementById('lastUpdated');
+
+    // Set default dates (last 30 days)
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 182); // Last 6 months
+    startDateElem.valueAsDate = startDate;
+    endDateElem.valueAsDate = endDate;
+
+    let chart;
+    let refreshTimer;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initChart();
+      fetchData();
+      // Auto-refresh every 10 minutes (600,000 ms)
+      refreshTimer = setInterval(fetchData, 600000);
+    });
+
+    applyFilterBtn.addEventListener('click', fetchData);
+    refreshBtn.addEventListener('click', fetchData);
+
+    function initChart() {
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: { 
+          labels: [], 
+          datasets: [{
+            label: 'User Interactions',
+            data: [],
+            backgroundColor: '#CE3EC0',
+            borderRadius: 6,
+            barPercentage: 0.1
+          }] 
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false, // Allows the canvas to fill the fixed wrapper
+          scales: {
+            y: { 
+              beginAtZero: true, 
+              ticks: { color: '#f1e6f9' }, 
+              grid: { color: 'rgba(255,255,255,0.1)' },
+              title: { display: true, text: 'Number of Interactions', color: '#888' }
+            },
+            x: { 
+              ticks: { color: '#f1e6f9', maxRotation: 45 }, 
+              grid: { display: false }
+            }
+          },
+          plugins: { 
+            legend: { labels: { color: '#f1e6f9' } },
+            tooltip: { backgroundColor: '#2a2740', titleColor: '#fff', bodyColor: '#ccc' }
+          }
+        }
+      });
+    }
+
+    // Improved timestamp extraction function
+    function extractTimestamp(msg) {
+      if (!msg) return null;
+      
+      const timestampFields = ['timestamp', 'createdAt', 'created_at', 'time', 'date', 'ts', 'created', 'sentAt', 'sent_at'];
+      
+      for (const field of timestampFields) {
+        if (msg[field] !== undefined && msg[field] !== null) {
+          const value = msg[field];
+          
+          if (typeof value === 'number') {
+            if (value > 1000000000 && value < 10000000000) {
+              return new Date(value * 1000);
+            }
+            return new Date(value);
+          }
+          
+          if (typeof value === 'string') {
+            const d = new Date(value);
+            if (!isNaN(d)) return d;
+            
+            if (/^\d+$/.test(value)) {
+              const numValue = parseInt(value, 10);
+              if (numValue > 1000000000 && numValue < 10000000000) {
+                return new Date(numValue * 1000);
+              }
+              return new Date(numValue);
+            }
+          }
+        }
+      }
+      
+      if (msg._seconds) {
+        return new Date(msg._seconds * 1000);
+      }
+      
+      return null;
+    }
+
+    function extractPhoneNumber(key, messages) {
+      if (key.startsWith('conversation:')) {
+        return key.substring(13);
+      }
+      
+      if (messages && messages.length > 0) {
+        for (const msg of messages) {
+          const phoneFields = ['phone', 'phoneNumber', 'from', 'userId', 'user', 'sender', 'phone_number', 'contact'];
+          for (const field of phoneFields) {
+            if (msg[field] && typeof msg[field] === 'string') {
+              return msg[field];
+            }
+          }
+        }
+      }
+      
+      return key;
+    }
+
+    function detectMessageRole(msg) {
+      if (msg.role) return msg.role;
+      if (msg.type) return msg.type;
+      if (msg.sender) return msg.sender;
+      if (msg.from) return msg.from;
+      if (msg.isUser === true) return 'user';
+      if (msg.isBot === true) return 'bot';
+      if (msg.isAssistant === true) return 'bot';
+      if (msg.intent || msg.confidence) return 'bot';
+      return 'user';
+    }
+
+    async function scanAllKeys(pattern = "conversation*") {
+      let allKeys = [];
+      let cursor = '0';
+      
+      try {
+        do {
+          const url = `${REDIS_URL}/scan/${cursor}?match=${encodeURIComponent(pattern)}&count=100`;
+          const res = await fetch(url, {
+            headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
+          });
+          
+          if (!res.ok) {
+            throw new Error(`Scan failed: ${res.status}`);
+          }
+          
+          const json = await res.json();
+          cursor = json.result[0];
+          const keys = json.result[1] || [];
+          
+          if (Array.isArray(keys)) {
+            allKeys.push(...keys);
+          }
+        } while (cursor !== '0');
+      } catch (err) {
+        console.error("scanAllKeys error:", err);
+        throw err;
+      }
+      
+      return [...new Set(allKeys)];
+    }
+
+    async function fetchConversation(key) {
+      try {
+        const encodedKey = encodeURIComponent(key);
+        const url = `${REDIS_URL}/get/${encodedKey}`;
+        
+        const res = await fetch(url, {
+          headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
+        });
+        
+        if (!res.ok) return null;
+        
+        const json = await res.json();
+        if (!json.result) return null;
+        
+        try {
+          const parsed = JSON.parse(json.result);
+          
+          if (Array.isArray(parsed)) {
+            return parsed;
+          } else if (parsed && typeof parsed === 'object') {
+            if (parsed.messages && Array.isArray(parsed.messages)) {
+              return parsed.messages;
+            }
+            if (parsed.text || parsed.content || parsed.message) {
+              return [parsed];
+            }
+            return [parsed];
+          }
+          
+          return null;
+        } catch (e) {
+          console.warn(`Failed to parse JSON for ${key}:`, e);
+          return null;
+        }
+      } catch (err) {
+        console.warn(`Error fetching ${key}:`, err);
+        return null;
+      }
+    }
+
+    async function fetchData() {
+      showLoading();
+      
+      try {
+        errorStatus.style.display = 'none';
+        
+        const keys = await scanAllKeys("conversation*");
+        
+        if (!keys || keys.length === 0) {
+          throw new Error("No conversation keys found in database");
+        }
+
+        const allConversations = [];
+        
+        for (let i = 0; i < keys.length; i++) {
+          const key = keys[i];
+          const msgs = await fetchConversation(key);
+          if (msgs && msgs.length > 0) {
+            allConversations.push({
+              key,
+              messages: msgs,
+              phone: extractPhoneNumber(key, msgs)
+            });
+          }
+        }
+
+        if (allConversations.length === 0) {
+          throw new Error("No conversations with messages found");
+        }
+
+        const filterStart = new Date(startDateElem.value);
+        const filterEnd = new Date(endDateElem.value);
+        filterEnd.setHours(23, 59, 59, 999);
+        const stats = calculateStats(allConversations, filterStart, filterEnd);
+        
+        updateCards(stats);
+        updateChart(stats.monthlyData);
+        updateInsights(stats);
+        
+        connectionStatus.style.display = 'block';
+        lastUpdatedElem.textContent = new Date().toLocaleTimeString();
+        
+      } catch (err) {
+        console.error("fetchData error:", err);
+        connectionStatus.style.display = 'none';
+        errorStatus.style.display = 'block';
+        errorStatus.textContent = `Error: ${err.message}`;
+        useMockData();
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function calculateStats(conversations, startDate, endDate) {
+      let totalUsers = 0;
+      let activeUsers30d = 0;
+      let totalMessages = 0;
+      let totalUserMessages = 0;
+      let totalBotMessages = 0;
+      let conversationsInRange = 0;
+      
+      const userSet = new Set();
+      const userActivity = new Map();
+      const monthlyInteractions = {};
+      const userMessageCount = new Map();
+      
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      conversations.forEach(conv => {
+        const phone = conv.phone;
+        const messages = conv.messages;
+        
+        if (phone) userSet.add(phone);
+        
+        let convStart = null;
+        let convEnd = null;
+        
+        messages.forEach(msg => {
+          const ts = extractTimestamp(msg);
+          
+          if (ts) {
+            totalMessages++;
+            
+            const role = detectMessageRole(msg);
+            if (role === 'user' || role === 'User' || role === 'USER') {
+              totalUserMessages++;
+            } else if (role === 'bot' || role === 'Bot' || role === 'BOT' || role === 'assistant') {
+              totalBotMessages++;
+            } else {
+              if (msg.text && typeof msg.text === 'string' && msg.text.startsWith('Bot:')) {
+                totalBotMessages++;
+              } else if (msg.content && typeof msg.content === 'string' && msg.content.startsWith('Bot:')) {
+                totalBotMessages++;
+              } else {
+                totalUserMessages++;
+              }
+            }
+            
+            if (phone) {
+              const existing = userActivity.get(phone) || { first: ts, last: ts, messageCount: 0 };
+              if (ts < existing.first) existing.first = ts;
+              if (ts > existing.last) existing.last = ts;
+              existing.messageCount = (existing.messageCount || 0) + 1;
+              userActivity.set(phone, existing);
+              userMessageCount.set(phone, (userMessageCount.get(phone) || 0) + 1);
+            }
+            
+            const monthKey = `${ts.getFullYear()}-${String(ts.getMonth() + 1).padStart(2, '0')}`;
+            monthlyInteractions[monthKey] = (monthlyInteractions[monthKey] || 0) + 1;
+            
+            if (!convStart || ts < convStart) convStart = ts;
+            if (!convEnd || ts > convEnd) convEnd = ts;
+          }
+        });
+        
+        if (convStart && convStart >= startDate && convStart <= endDate) {
+          conversationsInRange++;
+        }
+        
+        if (convEnd && convEnd >= thirtyDaysAgo) {
+          activeUsers30d++;
+        }
+      });
+      
+      totalUsers = userSet.size;
+      
+      let newUsersInRange = 0;
+      userActivity.forEach((activity) => {
+        if (activity.first >= startDate && activity.first <= endDate) {
+          newUsersInRange++;
+        }
+      });
+      
+      let returningUsers = 0;
+      userActivity.forEach(activity => {
+        const daysDiff = Math.round((activity.last - activity.first) / (1000 * 60 * 60 * 24));
+        if (daysDiff >= 1) returningUsers++;
+      });
+      
+      const retentionRate = totalUsers > 0 ? Math.round((returningUsers / totalUsers) * 100) : 0;
+      const responseRate = totalUserMessages > 0 ? Math.round((totalBotMessages / totalUserMessages) * 100) : 0;
+      
+      // Build every month in the selected range, showing 0 for months with no activity
+      const months = [];
+      const rangeStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+      const rangeEnd = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+      const cur = new Date(rangeStart);
+      while (cur <= rangeEnd) {
+        const monthKey = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}`;
+        months.push({
+          key: monthKey,
+          label: cur.toLocaleDateString('default', { month: 'short', year: 'numeric' })
+        });
+        cur.setMonth(cur.getMonth() + 1);
+      }
+      
+      const monthlyData = {
+        labels: months.map(m => m.label),
+        values: months.map(m => monthlyInteractions[m.key] || 0)
+      };
+      
+      const topUsers = Array.from(userMessageCount.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([phone, count]) => ({ 
+          phone: phone.length > 8 ? '...' + phone.slice(-8) : phone, 
+          count 
+        }));
+      
+      return {
+        totalUsers,
+        activeUsers30d,
+        conversations: conversationsInRange || conversations.length,
+        totalMessages,
+        avgMessages: conversations.length > 0 ? (totalMessages / conversations.length).toFixed(1) : 0,
+        newUsers: newUsersInRange,
+        retention: retentionRate,
+        responseRate,
+        monthlyData,
+        topUsers,
+        userMessages: totalUserMessages,
+        botMessages: totalBotMessages
+      };
+    }
+
+    function updateCards(stats) {
+      document.getElementById('totalUsers').textContent = stats.totalUsers;
+      document.getElementById('activeUsers').textContent = stats.activeUsers30d;
+      document.getElementById('conversations').textContent = stats.conversations;
+      document.getElementById('totalMessages').textContent = stats.totalMessages;
+      document.getElementById('avgMessages').textContent = stats.avgMessages;
+      document.getElementById('newUsers').textContent = stats.newUsers;
+      document.getElementById('retention').textContent = stats.retention + '%';
+      document.getElementById('responseRate').textContent = stats.responseRate + '%';
+    }
+
+    function updateChart(monthlyData) {
+      chart.data.labels = monthlyData.labels;
+      chart.data.datasets[0].data = monthlyData.values;
+      chart.update();
+      chartCanvas.style.display = monthlyData.labels.length ? 'block' : 'none';
+    }
+
+    function updateInsights(stats) {
+      const topUsersList = document.getElementById('topUsers');
+      if (stats.topUsers && stats.topUsers.length > 0) {
+        topUsersList.innerHTML = stats.topUsers.map(u => 
+          `<li><span>📱 ${u.phone}</span> <span style="color:var(--accent)">${u.count} msgs</span></li>`
+        ).join('');
+      } else {
+        topUsersList.innerHTML = '<li>No user data available</li>';
+      }
+      
+      const messageStats = document.getElementById('messageStats');
+      messageStats.innerHTML = `
+        <li><span>👤 User messages</span> <span style="color:var(--accent)">${stats.userMessages || 0}</span></li>
+        <li><span>🤖 Bot messages</span> <span style="color:var(--primary)">${stats.botMessages || 0}</span></li>
+        <li><span>📊 Total interactions</span> <span>${stats.totalMessages || 0}</span></li>
+        <li><span>💬 Conversations</span> <span>${stats.conversations || 0}</span></li>
+      `;
+    }
+
+    function useMockData() {
+      const mockStats = {
+        totalUsers: 156,
+        activeUsers30d: 89,
+        conversations: 234,
+        totalMessages: 1243,
+        avgMessages: 5.3,
+        newUsers: 34,
+        retention: 67,
+        responseRate: 92,
+        monthlyData: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          values: [145, 168, 192, 157, 234, 289]
+        },
+        topUsers: [
+          { phone: '...60709', count: 45 },
+          { phone: '...92709', count: 38 },
+          { phone: '...14248', count: 32 }
+        ],
+        userMessages: 845,
+        botMessages: 398
+      };
+      
+      updateCards(mockStats);
+      updateChart(mockStats.monthlyData);
+      updateInsights(mockStats);
+    }
+
+    function showLoading() { 
+      loadingElem.style.display = 'flex'; 
+      chartCanvas.style.display = 'none'; 
+    }
+    
+    function hideLoading() { 
+      loadingElem.style.display = 'none'; 
+    }
+
+    window.addEventListener('beforeunload', () => {
+      if (refreshTimer) clearInterval(refreshTimer);
+    });
+  </script>
+  
+  <!-- js -->
+	<script src="js/core.js"></script>
+	<script src="js/script.min.js"></script>
+	<script src="js/process.js"></script>
+	<script src="js/layout-settings.js"></script>
+</body>
+</html>

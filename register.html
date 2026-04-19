@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- Basic Page Info -->
+	<meta charset="utf-8">
+	<title>Dawa Health</title>
+
+	<!-- Site favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+
+	<!-- Mobile Specific Metas -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- Google Font -->
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+	<!-- CSS -->
+	<link rel="stylesheet" type="text/css" href="css/core.css">
+	<link rel="stylesheet" type="text/css" href="css/icon-font.min.css">
+	<link rel="stylesheet" type="text/css" href="src/plugins/jquery-steps/jquery.steps.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+	<!-- Firebase SDK -->
+	<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics-compat.js"></script>
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-119386393-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'UA-119386393-1');
+
+		const firebaseConfig = {
+			apiKey: "AIzaSyAVIDHMKVaEUYcV67xJI-DqaOpC8FP8R2M",
+			authDomain: "dawa-ca263.firebaseapp.com",
+			projectId: "dawa-ca263",
+			storageBucket: "dawa-ca263.appspot.com",
+			messagingSenderId: "103718044142",
+			appId: "1:103718044142:web:f6d166d3d3f95e53c30eff",
+			measurementId: "G-61B20Q72DW"
+		};
+
+		firebase.initializeApp(firebaseConfig);
+		firebase.analytics();
+	</script>
+
+	<style>
+		/* ── Toast Notification System ── */
+		#toast-container {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			z-index: 99999;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			pointer-events: none;
+		}
+
+		.toast {
+			display: flex;
+			align-items: flex-start;
+			gap: 12px;
+			min-width: 320px;
+			max-width: 400px;
+			padding: 14px 16px;
+			border-radius: 12px;
+			box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+			background: #fff;
+			pointer-events: all;
+			cursor: pointer;
+			animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+			border-left: 4px solid transparent;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.toast.removing {
+			animation: toastOut 0.3s ease-in forwards;
+		}
+
+		.toast::after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			height: 3px;
+			background: currentColor;
+			opacity: 0.25;
+			width: 100%;
+			animation: toastProgress var(--duration, 5s) linear forwards;
+			transform-origin: left;
+		}
+
+		.toast.toast-error   { border-left-color: #e53e3e; color: #e53e3e; }
+		.toast.toast-success { border-left-color: #38a169; color: #38a169; }
+		.toast.toast-info    { border-left-color: #3182ce; color: #3182ce; }
+		.toast.toast-warning { border-left-color: #d69e2e; color: #d69e2e; }
+
+		.toast.toast-error   .toast-icon-wrap { background: #fff5f5; color: #e53e3e; }
+		.toast.toast-success .toast-icon-wrap { background: #f0fff4; color: #38a169; }
+		.toast.toast-info    .toast-icon-wrap { background: #ebf8ff; color: #3182ce; }
+		.toast.toast-warning .toast-icon-wrap { background: #fffff0; color: #d69e2e; }
+
+		.toast-icon-wrap {
+			flex-shrink: 0;
+			width: 36px;
+			height: 36px;
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 16px;
+		}
+
+		.toast-body  { flex: 1; min-width: 0; }
+
+		.toast-title {
+			font-family: 'Inter', sans-serif;
+			font-weight: 600;
+			font-size: 14px;
+			color: #1a202c;
+			margin-bottom: 2px;
+			line-height: 1.3;
+		}
+
+		.toast-message {
+			font-family: 'Inter', sans-serif;
+			font-size: 13px;
+			color: #4a5568;
+			line-height: 1.4;
+		}
+
+		.toast-close {
+			flex-shrink: 0;
+			background: none;
+			border: none;
+			color: #a0aec0;
+			cursor: pointer;
+			padding: 2px;
+			font-size: 14px;
+			line-height: 1;
+			transition: color 0.15s;
+			margin-top: 1px;
+		}
+		.toast-close:hover { color: #718096; }
+
+		@keyframes toastIn {
+			from { opacity: 0; transform: translateX(50px) scale(0.95); }
+			to   { opacity: 1; transform: translateX(0) scale(1); }
+		}
+
+		@keyframes toastOut {
+			from { opacity: 1; transform: translateX(0) scale(1);   max-height: 100px; margin-bottom: 0; }
+			to   { opacity: 0; transform: translateX(60px) scale(0.9); max-height: 0; margin-bottom: -10px; padding-top: 0; padding-bottom: 0; }
+		}
+
+		@keyframes toastProgress {
+			from { transform: scaleX(1); }
+			to   { transform: scaleX(0); }
+		}
+
+		/* ── Success Toast (larger, centred) ── */
+		.toast.toast-success-lg {
+			min-width: 340px;
+			flex-direction: column;
+			align-items: center;
+			text-align: center;
+			padding: 24px 20px 20px;
+			border-left: none;
+			border-top: 4px solid #38a169;
+			border-radius: 14px;
+		}
+		.toast.toast-success-lg .toast-icon-wrap {
+			width: 52px;
+			height: 52px;
+			border-radius: 50%;
+			font-size: 22px;
+			margin-bottom: 10px;
+			background: #f0fff4;
+			color: #38a169;
+		}
+		.toast.toast-success-lg .toast-title   { font-size: 16px; text-align: center; }
+		.toast.toast-success-lg .toast-message { text-align: center; font-size: 13.5px; }
+		.toast.toast-success-lg .toast-actions {
+			margin-top: 14px;
+			display: flex;
+			gap: 8px;
+		}
+		.toast.toast-success-lg .toast-actions a {
+			display: inline-block;
+			padding: 8px 20px;
+			border-radius: 8px;
+			font-size: 13px;
+			font-weight: 600;
+			text-decoration: none;
+			background: #38a169;
+			color: #fff;
+			transition: background 0.2s;
+		}
+		.toast.toast-success-lg .toast-actions a:hover { background: #2f855a; }
+
+		@media (max-width: 480px) {
+			#toast-container { top: 12px; right: 12px; left: 12px; }
+			.toast           { min-width: unset; max-width: 100%; }
+		}
+	</style>
+</head>
+<body class="login-page">
+
+	<!-- Toast Notification Container -->
+	<div id="toast-container"></div>
+
+	<div class="login-header box-shadow"></div>
+
+	<div class="login-wrap d-flex align-items-center flex-wrap justify-content-center">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-md-6 col-lg-7">
+					<img src="img/register-page-img.png" alt="">
+				</div>
+				<div class="col-md-6 col-lg-5">
+					<div class="login-box bg-white box-shadow border-radius-10">
+						<div class="login-title">
+							<h2 class="text-center text-primary">Register</h2>
+						</div>
+						<form id="registerForm">
+							<div class="select-role col-md-12 d-flex justify-content-center">
+								<div class="btn-group btn-group-toggle" data-toggle="buttons">									
+									<label class="btn">
+										<input type="radio" name="options" id="user">
+										<div class="icon"><img src="img/person.svg" class="svg" alt=""></div>
+										<span>Admin</span>
+									</label>
+								</div>
+							</div>
+							<div class="input-group custom">
+								<input type="email" class="form-control form-control-lg" id="email" placeholder="Email" required>
+								<div class="input-group-append custom">
+									<span class="input-group-text"><i class="icon-copy dw dw-user1"></i></span>
+								</div>
+							</div>
+							<div class="input-group custom">
+								<input type="password" class="form-control form-control-lg" id="password" placeholder="Password" required>
+								<div class="input-group-append custom">
+									<span class="input-group-text"><i class="dw dw-padlock1"></i></span>
+								</div>
+							</div>
+							<div class="input-group custom">
+								<input type="password" class="form-control form-control-lg" id="confirmPassword" placeholder="Confirm Password" required>
+								<div class="input-group-append custom">
+									<span class="input-group-text"><i class="dw dw-padlock1"></i></span>
+								</div>
+							</div>
+							<div class="row pb-30 align-items-center">
+								<div class="col-6 text-left">
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input" id="termsCheck" required>
+										<label class="custom-control-label" for="termsCheck">I agree to terms</label>
+									</div>
+								</div>
+								<div class="col-6 text-right">
+									<a href="login.html" class="text-primary">Login</a>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-sm-12">
+									<div class="input-group mb-0">
+										<input class="btn btn-primary btn-lg btn-block" type="submit" value="Register" id="registerButton">
+									</div>
+									<div class="font-16 weight-600 pt-10 pb-10 text-center" data-color="#707373">OR</div>
+									<div class="input-group mb-0">
+										<button type="button" class="btn btn-outline-primary btn-lg btn-block" id="googleRegister">
+											Continue with Google
+										</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- js -->
+	<script src="vendors/scripts/core.js"></script>
+	<script src="vendors/scripts/script.min.js"></script>
+	<script src="vendors/scripts/process.js"></script>
+	<script src="vendors/scripts/layout-settings.js"></script>
+	<script src="src/plugins/jquery-steps/jquery.steps.js"></script>
+	<script src="vendors/scripts/steps-setting.js"></script>
+
+	<script>
+		/* ── Toast Notification API ── */
+		const Toast = (() => {
+			const ICONS = {
+				error:   'fa-solid fa-circle-exclamation',
+				success: 'fa-solid fa-circle-check',
+				info:    'fa-solid fa-circle-info',
+				warning: 'fa-solid fa-triangle-exclamation',
+			};
+
+			const TITLES = {
+				error:   'Something went wrong',
+				success: 'Success',
+				info:    'Heads up',
+				warning: 'Warning',
+			};
+
+			function show(message, type = 'info', duration = 5000) {
+				const container = document.getElementById('toast-container');
+				const toast = document.createElement('div');
+				toast.className = `toast toast-${type}`;
+				toast.style.setProperty('--duration', `${duration}ms`);
+
+				toast.innerHTML = `
+					<div class="toast-icon-wrap">
+						<i class="${ICONS[type]}"></i>
+					</div>
+					<div class="toast-body">
+						<div class="toast-title">${TITLES[type]}</div>
+						<div class="toast-message">${message}</div>
+					</div>
+					<button class="toast-close" aria-label="Dismiss">
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+				`;
+
+				function dismiss() {
+					toast.classList.add('removing');
+					toast.addEventListener('animationend', () => toast.remove(), { once: true });
+				}
+
+				toast.querySelector('.toast-close').addEventListener('click', dismiss);
+				toast.addEventListener('click', dismiss);
+				container.appendChild(toast);
+
+				const timer = setTimeout(dismiss, duration);
+				toast.addEventListener('mouseenter', () => clearTimeout(timer));
+				toast.addEventListener('mouseleave', () => setTimeout(dismiss, 1500));
+
+				return { toast, dismiss };
+			}
+
+			/* Special large success popup with a CTA button */
+			function showRegistrationSuccess() {
+				const container = document.getElementById('toast-container');
+				const toast = document.createElement('div');
+				toast.className = 'toast toast-success-lg';
+				toast.style.setProperty('--duration', '12000ms');
+
+				toast.innerHTML = `
+					<button class="toast-close" style="position:absolute;top:10px;right:12px;" aria-label="Dismiss">
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+					<div class="toast-icon-wrap">
+						<i class="fa-solid fa-circle-check"></i>
+					</div>
+					<div class="toast-body">
+						<div class="toast-title">Registration Successful! 🎉</div>
+						<div class="toast-message">Your account has been created. You can now sign in to Dawa Health.</div>
+					</div>
+					<div class="toast-actions">
+						<a href="login.html">Continue to Login</a>
+					</div>
+				`;
+
+				function dismiss() {
+					toast.classList.add('removing');
+					toast.addEventListener('animationend', () => toast.remove(), { once: true });
+				}
+
+				toast.querySelector('.toast-close').addEventListener('click', dismiss);
+				container.appendChild(toast);
+				setTimeout(dismiss, 12000);
+			}
+
+			return {
+				error:   (msg, dur) => show(msg, 'error',   dur),
+				success: (msg, dur) => show(msg, 'success', dur),
+				info:    (msg, dur) => show(msg, 'info',    dur),
+				warning: (msg, dur) => show(msg, 'warning', dur),
+				registrationSuccess: showRegistrationSuccess,
+			};
+		})();
+
+		/* ── Map Firebase error codes to friendly messages ── */
+		function getFriendlyError(code) {
+			const map = {
+				'auth/email-already-in-use':       'An account with this email already exists. Try logging in instead.',
+				'auth/invalid-email':              'Please enter a valid email address.',
+				'auth/operation-not-allowed':      'Email/password accounts are not enabled. Please contact support.',
+				'auth/weak-password':              'Password is too weak. Please use at least 6 characters.',
+				'auth/network-request-failed':     'Network error. Please check your connection and try again.',
+				'auth/too-many-requests':          'Too many attempts. Please wait a moment before trying again.',
+				'auth/popup-closed-by-user':       'Sign-up window was closed. Please try again.',
+				'auth/popup-blocked':              'Pop-up was blocked by your browser. Please allow pop-ups for this site.',
+				'auth/account-exists-with-different-credential':
+				                                   'An account already exists with this email using a different sign-in method.',
+				'auth/cancelled-popup-request':    'Only one sign-up window can be open at a time.',
+				'auth/user-disabled':              'This account has been disabled. Please contact support.',
+				'auth/requires-recent-login':      'Please sign in again to complete this action.',
+			};
+			return map[code] || 'An unexpected error occurred. Please try again.';
+		}
+
+		/* ── Registration Logic ── */
+		document.addEventListener('DOMContentLoaded', function() {
+			const registerForm   = document.getElementById('registerForm');
+			const googleRegister = document.getElementById('googleRegister');
+			const registerButton = document.getElementById('registerButton');
+
+			// Email / password registration
+			registerForm.addEventListener('submit', function(e) {
+				e.preventDefault();
+
+				const email           = document.getElementById('email').value.trim();
+				const password        = document.getElementById('password').value;
+				const confirmPassword = document.getElementById('confirmPassword').value;
+				const termsCheck      = document.getElementById('termsCheck').checked;
+
+				// Client-side validation
+				if (!email) {
+					Toast.warning('Please enter your email address.');
+					return;
+				}
+				if (!password) {
+					Toast.warning('Please enter a password.');
+					return;
+				}
+				if (password.length < 6) {
+					Toast.warning('Password must be at least 6 characters long.');
+					return;
+				}
+				if (password !== confirmPassword) {
+					Toast.error('Passwords don\'t match. Please check and try again.');
+					return;
+				}
+				if (!termsCheck) {
+					Toast.warning('Please agree to the terms and conditions to continue.');
+					return;
+				}
+
+				registerButton.disabled = true;
+				registerButton.value    = 'Registering…';
+
+				firebase.auth().createUserWithEmailAndPassword(email, password)
+					.then((userCredential) => {
+						Toast.registrationSuccess();
+					})
+					.catch((error) => {
+						Toast.error(getFriendlyError(error.code));
+						registerButton.disabled = false;
+						registerButton.value    = 'Register';
+					});
+			});
+
+			// Google Registration
+			googleRegister.addEventListener('click', function() {
+				googleRegister.disabled    = true;
+				googleRegister.textContent = 'Signing up…';
+
+				const provider = new firebase.auth.GoogleAuthProvider();
+
+				firebase.auth().signInWithPopup(provider)
+					.then((result) => {
+						Toast.registrationSuccess();
+					})
+					.catch((error) => {
+						Toast.error(getFriendlyError(error.code));
+						googleRegister.disabled    = false;
+						googleRegister.textContent = 'Continue with Google';
+					});
+			});
+		});
+	</script>
+</body>
+</html>

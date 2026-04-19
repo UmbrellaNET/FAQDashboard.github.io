@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
+  <meta name="copyright" content="MACode ID, https://www.macodeid.com/">
+  
+  <title>UmbrellaNet</title>
+
+  <!-- Site favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="img/logo.ico">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/logo.ico">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/logo.ico">
+  
+
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  
+  <link rel="stylesheet" type="text/css" href="css/themify-icons.css">
+  
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+
+  <link rel="stylesheet" type="text/css" href="css/animate.css">
+
+  <link rel="stylesheet" type="text/css" href="css/owl.carousel.css">
+
+  <link rel="stylesheet" type="text/css" href="css/perfect-scrollbar.css">
+
+  <link rel="stylesheet" type="text/css" href="css/nice-select.css">
+
+  <link rel="stylesheet" type="text/css" href="css/jquery.fancybox.min.css">
+
+  <link rel="stylesheet" type="text/css" href="css/virtual.css">
+
+  <link rel="stylesheet" type="text/css" href="css/topbar.virtual.css">
+
+  <title>Web Designer Dialog Box</title>
+  <style>
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .dialog-overlay-1 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .dialog-overlay-2 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .dialog-box {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      max-width: 80%;
+      text-align: center;
+    }
+
+    .dialog1-box {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      max-width: 80%;
+      text-align: center;
+    }
+
+    .dialog2-box {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      max-width: 80%;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background-color: #5E185B;
+    }
+
+    .btn-theme {
+      background-color: #5E185B;
+    }
+
+    .btn-theme:hover {
+      background-color: #ff3b3b;
+    }
+
+    .notepad-calendar {
+      position: absolute;
+      left: 50px;
+      top: 130px;
+      width: 320px;
+      background-color: rgba(255, 254, 240, 0.50);
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      padding: 20px 15px 15px;
+      z-index: 10;
+      font-family: 'Courier New', monospace;
+      animation: fadeInLeft 0.8s ease-out;
+      overflow: hidden;
+    }
+
+    /* Top glued paper strip */
+    .notepad-calendar::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 12px;
+      width: 100%;
+      background: linear-gradient(to right, #5E185B, #5E185B);
+    }
+
+    /* Metal binder bar */
+    .notepad-calendar::after {
+      content: "";
+      position: absolute;
+      top: 12px;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(to bottom, #CE3EC0, #777);
+    }
+
+    /* Binder rings */
+    .binder-rings {
+      position: absolute;
+      top: 18px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      z-index: 3;
+    }
+
+    .binder-rings span {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #444;
+      box-shadow: inset 2px 2px 4px rgba(255,255,255,.2);
+    }
+
+    /* Push content down below binder */
+    .calendar-content {
+      margin-top: 40px;
+    }
+
+    /* Header */
+    .calendar-header-small {
+      text-align: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #ccc;
+    }
+
+    .calendar-title-small {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* Navigation */
+    .calendar-nav-small {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .calendar-nav-small button {
+      border: 1px solid #ccc;
+      background: #f5f5f5;
+      font-size: 12px;
+      padding: 4px 10px;
+      cursor: pointer;
+    }
+
+    /* Grid */
+    .calendar-weekdays-small,
+    .calendar-days-small {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+    }
+
+    .calendar-weekdays-small {
+      font-weight: bold;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .calendar-days-small {
+      gap: 4px;
+    }
+
+    .calendar-day-small {
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f9f9f5;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid #eee;
+    }
+
+    .calendar-day-small.today {
+      background: #5E185B;
+      color: white;
+    }
+
+    .calendar-day-small.selected {
+      background: #ff3b3b;
+      color: white;
+    }
+
+    .calendar-day-small.empty {
+      background: transparent;
+      border: none;
+    }
+
+    /* Lines */
+    .notepad-lines {
+      position: absolute;
+      top: 80px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      background: repeating-linear-gradient(
+        transparent,
+        transparent 28px,
+        rgba(0,0,0,0.08) 28px,
+        rgba(0,0,0,0.08) 29px
+      );
+      z-index: -1;
+    }
+
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @media (max-width: 768px) {
+      .notepad-calendar {
+        position: relative;
+        left: auto;
+        top: auto;
+        margin: 20px auto;
+      }
+    }
+    
+    .nav-btn {
+      background: none;
+      border: 1px solid #ddd;
+      padding: 5px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #555;
+      transition: all 0.2s;
+    }
+    
+    .nav-btn:hover {
+      background-color: #f5f5f5;
+      border-color: #ccc;
+    }
+    
+    .today-btn {
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .simple-calendar {
+        position: relative;
+        left: auto;
+        top: auto;
+        width: 90%;
+        margin: 20px auto;
+      }
+    }
+    
+  </style>
+</head>
+<body class="theme-red">
+  
+  <!-- Back to top button -->
+  <div class="btn-back_to_top">
+    <span class="ti-arrow-up"></span>
+  </div>
+  
+  <!-- Setting button -->
+
+  
+  <div class="vg-page page-home" id="home" style="background-image: url('img/login-page-img.png'); background-size: contain; background-position: center;  background-repeat: no-repeat;">
+    <!-- Navbar -->
+    <div class="navbar navbar-expand-lg navbar-dark sticky" data-offset="500">
+      <div class="container">
+        
+        <button class="navbar-toggler" data-toggle="collapse" data-target="#main-navbar" aria-expanded="true">
+          <span class="ti-menu"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="main-navbar">
+          <ul class="navbar-nav ml-auto">
+            <li class=" active">
+              <a href="index.html" class="nav-link" >Dashboard</a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="chats.html" class="nav-link" >Chats</a>
+            </li>
+            <li class="nav-item">
+              <a href="analytics.html" class="nav-link" >Analytics</a>
+            </li>
+            
+          </ul>
+          <ul class="nav ml-auto">
+            <li class="nav-item">
+              <a href="profile.html" class="btn btn-fab btn-theme no-shadow">Me</a>
+            </li>
+
+            <li class="nav-item">
+              <a href="index.html" class="btn btn-fab btn-theme no-shadow">Exit</a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </div> <!-- End Navbar -->
+    
+    <!-- Caption header -->
+    <div class="caption-header text-center wow zoomInDown">
+      <h5 class="fw-normal">Welcome to</h5>
+      <h1 class="fw-light mb-4"><b>Umbrella</b> <span class="fg-theme">NET</span></h1>
+      <div class="badge">tech is now</div>
+    </div> <!-- End Caption header -->
+    
+    <!-- CALENDAR -->
+    <div class="notepad-calendar">
+
+      <!-- Binder Rings -->
+      <div class="binder-rings">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <div class="calendar-content">
+        <div class="calendar-header-small">
+          <div class="calendar-title-small" id="calendar-month-year-small"></div>
+          <div class="calendar-nav-small">
+            <button id="prev-month-small">&lt;</button>
+            <button id="today-btn-small">Today</button>
+            <button id="next-month-small">&gt;</button>
+          </div>
+        </div>
+
+        <div class="calendar-weekdays-small">
+          <div>SUN</div><div>MON</div><div>TUE</div>
+          <div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+        </div>
+
+        <div class="calendar-days-small" id="calendar-days-small"></div>
+      </div>
+
+      <div class="notepad-lines"></div>
+    </div>
+    
+    <div class="floating-button"><span class="ti-mouse"></span></div>
+  </div>
+  
+  <!-- Dialog Overlays (keep existing) -->
+  <div class="dialog-overlay" id="dialog-overlay">
+    <div class="dialog-box">
+      <h3>Dialog Title</h3>
+      <p>Dialog content goes here.</p>
+      <button class="btn btn-theme" onclick="closeDialog()">Close</button>
+    </div>
+  </div>
+
+  <div class="dialog-overlay-1" id="dialog-overlay-1">
+    <div class="dialog1-box">
+      <h3>Dialog 1 Title</h3>
+      <p>Dialog 1 content goes here.</p>
+      <button class="btn btn-theme" onclick="closeDialog1()">Close</button>
+    </div>
+  </div>
+
+  <div class="dialog-overlay-2" id="dialog-overlay-2">
+    <div class="dialog2-box">
+      <h3>Dialog 2 Title</h3>
+      <p>Dialog 2 content goes here.</p>
+      <button class="btn btn-theme" onclick="closeDialog2()">Close</button>
+    </div>
+  </div>
+  
+  <script src="js/jquery-3.5.1.min.js"></script>
+    
+  <script src="js/bootstrap.bundle.min.js"></script>
+    
+  <script src="js/owl.carousel.min.js"></script>
+    
+  <script src="js/perfect-scrollbar.js"></script>
+    
+  <script src="js/isotope.pkgd.min.js"></script>
+    
+  <script src="js/jquery.nice-select.min.js"></script>
+    
+  <script src="js/jquery.fancybox.min.js"></script>
+
+  <script src="js/"></script>
+
+  <script src="js/jquery.animateNumber.min.js"></script>
+
+  <script src="js/jquery.waypoints.min.js"></script>
+
+  <script src="js/google-maps.js"></script>
+    
+  <script src="js/topbar-virtual.js"></script>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAIA_zqjFMsJM_sxP9-6Pde5vVCTyJmUHM&callback=initMap"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+
+  <script>
+let currentDateSmall = new Date();
+let selectedDateSmall = new Date();
+
+function renderSmallCalendar(date) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById('calendar-month-year-small').textContent = `${monthNames[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const calendarDays = document.getElementById('calendar-days-small');
+  calendarDays.innerHTML = '';
+
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'calendar-day-small empty';
+    calendarDays.appendChild(empty);
+  }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const el = document.createElement('div');
+    el.className = 'calendar-day-small';
+    el.textContent = day;
+
+    const dayDate = new Date(year, month, day);
+    dayDate.setHours(0,0,0,0);
+
+    if (dayDate.getTime() === today.getTime()) el.classList.add('today');
+    if (dayDate.getTime() === selectedDateSmall.getTime()) el.classList.add('selected');
+
+    el.onclick = () => {
+      selectedDateSmall = dayDate;
+      renderSmallCalendar(currentDateSmall);
+    };
+
+    calendarDays.appendChild(el);
+  }
+}
+
+document.getElementById('prev-month-small').onclick = () => {
+  currentDateSmall.setMonth(currentDateSmall.getMonth() - 1);
+  renderSmallCalendar(currentDateSmall);
+};
+
+document.getElementById('next-month-small').onclick = () => {
+  currentDateSmall.setMonth(currentDateSmall.getMonth() + 1);
+  renderSmallCalendar(currentDateSmall);
+};
+
+document.getElementById('today-btn-small').onclick = () => {
+  currentDateSmall = new Date();
+  selectedDateSmall = new Date();
+  renderSmallCalendar(currentDateSmall);
+};
+
+renderSmallCalendar(currentDateSmall);
+</script>
+
+</body>
+</html>
