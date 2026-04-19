@@ -27,6 +27,11 @@
             --muted: #94a3b8;
             --msg-agent: rgba(104, 61, 102, 0.85);
             --msg-user: rgba(129, 140, 248, 0.2);
+            /* analytics sidebar vars */
+            --nav-bg: #2a2740;
+            --nav-primary: #5E185B;
+            --nav-text: #f1e6f9;
+            --nav-muted: #2b2b44;
         }
 
         body {
@@ -36,6 +41,88 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
+        }
+
+        /* ── ANALYTICS-STYLE NAV SIDEBAR ── */
+        .nav-sidebar {
+            width: 240px;
+            background: var(--nav-bg);
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-right: 1px solid #333;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-brand {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+        }
+
+        .nav-logo img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .nav-brand h1 {
+            font-size: 18px;
+            margin: 0;
+            color: #fff;
+        }
+
+        .nav-brand .nav-sub {
+            font-size: 12px;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .nav-links a {
+            color: var(--nav-text);
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            background: var(--nav-muted);
+        }
+
+        .nav-links a.active {
+            background: var(--nav-primary);
+            color: white;
+        }
+
+        /* ── MAIN WRAPPER (offset by nav sidebar) ── */
+        .app-wrapper {
+            margin-left: 240px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         /* ── LOGIN SCREEN ── */
@@ -60,58 +147,58 @@
             gap: 20px;
         }
 
-            .login-card h1 {
-                font-size: 1.6rem;
-                background: var(--accent);
-                -webkit-background-clip: text;
-                background-clip: text;
-                color: transparent;
-                text-align: center;
-            }
+        .login-card h1 {
+            font-size: 1.6rem;
+            background: var(--accent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+        }
 
-            .login-card p {
-                font-size: 14px;
-                color: var(--muted);
-                text-align: center;
-            }
+        .login-card p {
+            font-size: 14px;
+            color: var(--muted);
+            text-align: center;
+        }
 
-            .login-card label {
-                font-size: 13px;
-                color: var(--muted);
-                margin-bottom: -12px;
-            }
+        .login-card label {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: -12px;
+        }
 
-            .login-card input {
-                padding: 11px 15px;
-                border-radius: 11px;
-                background: var(--surface2);
-                border: 1px solid var(--border);
-                color: var(--text);
-                font-size: 14px;
-                outline: none;
-                transition: border-color 0.2s, box-shadow 0.2s;
-            }
+        .login-card input {
+            padding: 11px 15px;
+            border-radius: 11px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
 
-                .login-card input:focus {
-                    border-color: var(--accent);
-                    box-shadow: 0 0 0 3px rgba(235,178,230,0.15);
-                }
+        .login-card input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(235,178,230,0.15);
+        }
 
-            .login-card .btn-primary {
-                padding: 12px;
-                border-radius: 11px;
-                background: linear-gradient(to right, var(--accent2), var(--accent));
-                border: none;
-                color: white;
-                font-size: 15px;
-                font-weight: 700;
-                cursor: pointer;
-                transition: opacity 0.2s;
-            }
+        .login-card .btn-primary {
+            padding: 12px;
+            border-radius: 11px;
+            background: linear-gradient(to right, var(--accent2), var(--accent));
+            border: none;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
 
-                .login-card .btn-primary:hover {
-                    opacity: 0.88;
-                }
+        .login-card .btn-primary:hover {
+            opacity: 0.88;
+        }
 
         /* ── AGENT PANEL ── */
         #agentPanel {
@@ -189,9 +276,9 @@
             transition: background 0.2s;
         }
 
-            .btn-logout:hover {
-                background: rgba(239,68,68,0.1);
-            }
+        .btn-logout:hover {
+            background: rgba(239,68,68,0.1);
+        }
 
         /* Main layout */
         .panel-body {
@@ -237,12 +324,12 @@
             font-size: 13px;
         }
 
-            .empty-state i {
-                font-size: 28px;
-                margin-bottom: 10px;
-                display: block;
-                opacity: 0.4;
-            }
+        .empty-state i {
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: block;
+            opacity: 0.4;
+        }
 
         .request-card {
             background: var(--surface2);
@@ -253,17 +340,16 @@
             transition: border-color 0.2s, background 0.2s;
         }
 
-            .request-card:hover {
-                border-color: var(--accent);
-                background: rgba(235,178,230,0.04);
-            }
+        .request-card:hover {
+            border-color: var(--accent);
+            background: rgba(235,178,230,0.04);
+        }
 
-            .request-card.active {
-                border-color: var(--accent);
-                background: rgba(235,178,230,0.07);
-            }
+        .request-card.active {
+            border-color: var(--accent);
+            background: rgba(235,178,230,0.07);
+        }
 
-            
         .rc-header {
             display: flex;
             align-items: center;
@@ -317,9 +403,9 @@
             border: 1px solid rgba(239,68,68,0.3);
         }
 
-            .btn-accept:hover, .btn-deny:hover {
-                opacity: 0.82;
-            }
+        .btn-accept:hover, .btn-deny:hover {
+            opacity: 0.82;
+        }
 
         .rc-live-badge {
             font-size: 11px;
@@ -347,14 +433,14 @@
             gap: 14px;
         }
 
-            .chat-placeholder i {
-                font-size: 48px;
-                opacity: 0.2;
-            }
+        .chat-placeholder i {
+            font-size: 48px;
+            opacity: 0.2;
+        }
 
-            .chat-placeholder p {
-                font-size: 15px;
-            }
+        .chat-placeholder p {
+            font-size: 15px;
+        }
 
         /* Active chat */
         #activeChat {
@@ -395,9 +481,9 @@
             transition: background 0.2s;
         }
 
-            .btn-end:hover {
-                background: rgba(239,68,68,0.1);
-            }
+        .btn-end:hover {
+            background: rgba(239,68,68,0.1);
+        }
 
         .messages-wrap {
             flex: 1;
@@ -461,36 +547,36 @@
             gap: 10px;
         }
 
-            .input-area input {
-                flex: 1;
-                padding: 11px 16px;
-                border-radius: 12px;
-                background: var(--surface2);
-                border: 1px solid var(--border);
-                color: var(--text);
-                font-size: 14px;
-                outline: none;
-            }
+        .input-area input {
+            flex: 1;
+            padding: 11px 16px;
+            border-radius: 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+        }
 
-                .input-area input:focus {
-                    border-color: var(--accent);
-                    box-shadow: 0 0 0 2px rgba(235,178,230,0.15);
-                }
+        .input-area input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(235,178,230,0.15);
+        }
 
-            .input-area button {
-                background: linear-gradient(to right, var(--accent2), var(--accent));
-                border: none;
-                border-radius: 12px;
-                width: 48px;
-                color: white;
-                font-size: 17px;
-                cursor: pointer;
-                transition: opacity 0.2s;
-            }
+        .input-area button {
+            background: linear-gradient(to right, var(--accent2), var(--accent));
+            border: none;
+            border-radius: 12px;
+            width: 48px;
+            color: white;
+            font-size: 17px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
 
-                .input-area button:hover {
-                    opacity: 0.88;
-                }
+        .input-area button:hover {
+            opacity: 0.88;
+        }
 
         /* Notification toast */
         .toast {
@@ -510,10 +596,10 @@
             gap: 12px;
         }
 
-            .toast i {
-                font-size: 20px;
-                color: var(--accent);
-            }
+        .toast i {
+            font-size: 20px;
+            color: var(--accent);
+        }
 
         .toast-body p:first-child {
             font-size: 14px;
@@ -526,33 +612,20 @@
         }
 
         @keyframes pulse-dot {
-            0%, 100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(30px); }
+            to   { opacity: 1; transform: translateX(0); }
         }
 
         /* Responsive */
         @media (max-width: 700px) {
-            .panel-body {
-                grid-template-columns: 1fr;
-            }
-
+            .nav-sidebar { display: none; }
+            .app-wrapper { margin-left: 0; }
+            .panel-body { grid-template-columns: 1fr; }
             .sidebar {
                 max-height: 220px;
                 border-right: none;
@@ -563,111 +636,122 @@
 </head>
 <body>
 
-    <!-- ════════════ LOGIN ════════════ -->
-    <div id="loginScreen">
-        <div class="login-card">
-            <h1><i class="fas fa-headset"></i> Agent Panel</h1>
-            <p>Enter your name to go online and start receiving chat requests.</p>
-            <label for="agentNameInput">Your name</label>
-            <input type="text" id="agentNameInput" placeholder="e.g. Sarah" maxlength="40" autocomplete="off">
-            <button class="btn-primary" id="loginBtn">Go Online <i class="fas fa-arrow-right"></i></button>
-        </div>
-    </div>
-
-    <!-- ════════════ AGENT PANEL ════════════ -->
-    <div id="agentPanel">
-        <div class="topbar">
-            <div class="topbar-left">
-                <div class="topbar-avatar"><i class="fas fa-headset"></i></div>
-                <div>
-                    <h2 id="topbarName">Agent</h2>
-                    <div class="subtitle">Umbrella Labs Support</div>
-                </div>
+    <!-- ════════════ NAV SIDEBAR (from analytics.html) ════════════ -->
+    <aside class="nav-sidebar">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <img src="img/logo.svg" alt="">
             </div>
-            <div class="status-badge">
-                <div class="status-dot-lg" id="onlineDot"></div>
-                <span id="onlineLabel">Online</span>
+            <div>
+                <h1>UmbrellaNet</h1>
+                <div class="nav-sub">Admin Dashboard</div>
             </div>
-            <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log out</button>
+        </div>
+        <nav class="nav-links">
+            <a href="chats.html">Chats</a>
+            <a href="analytics.html">Analytics</a>
+            <a href="agent.html" class="active">Agent</a>
+            <a href="index2.html">Dashboard</a>
+        </nav>
+    </aside>
+
+    <!-- ════════════ MAIN APP WRAPPER ════════════ -->
+    <div class="app-wrapper">
+
+        <!-- ════════════ LOGIN ════════════ -->
+        <div id="loginScreen">
+            <div class="login-card">
+                <h1><i class="fas fa-headset"></i> Agent Panel</h1>
+                <p>Enter your name to go online and start receiving chat requests.</p>
+                <label for="agentNameInput">Your name</label>
+                <input type="text" id="agentNameInput" placeholder="e.g. Sarah" maxlength="40" autocomplete="off">
+                <button class="btn-primary" id="loginBtn">Go Online <i class="fas fa-arrow-right"></i></button>
+            </div>
         </div>
 
-        <div class="panel-body">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="sidebar-title"><i class="fas fa-inbox"></i> &nbsp;Incoming &amp; Active Chats</div>
-                <div id="requestList">
-                    <div class="empty-state" id="emptyState">
-                        <i class="fas fa-comment-dots"></i>
-                        No pending requests
+        <!-- ════════════ AGENT PANEL ════════════ -->
+        <div id="agentPanel">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <div class="topbar-avatar"><i class="fas fa-headset"></i></div>
+                    <div>
+                        <h2 id="topbarName">Agent</h2>
+                        <div class="subtitle">Umbrella Labs Support</div>
                     </div>
                 </div>
+                <div class="status-badge">
+                    <div class="status-dot-lg" id="onlineDot"></div>
+                    <span id="onlineLabel">Online</span>
+                </div>
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log out</button>
             </div>
 
-            <!-- Chat area -->
-            <div class="chat-area" id="chatArea">
-                <div class="chat-placeholder" id="chatPlaceholder">
-                    <i class="fas fa-comments"></i>
-                    <p>Select a chat from the sidebar</p>
-                </div>
-
-                <div id="activeChat">
-                    <div class="chat-top">
-                        <div class="chat-top-info">
-                            <h3 id="activeChatName">User</h3>
-                            <p id="activeChatSub">Live chat</p>
+            <div class="panel-body">
+                <!-- Incoming & Active chats sidebar -->
+                <div class="sidebar">
+                    <div class="sidebar-title"><i class="fas fa-inbox"></i> &nbsp;Incoming &amp; Active Chats</div>
+                    <div id="requestList">
+                        <div class="empty-state" id="emptyState">
+                            <i class="fas fa-comment-dots"></i>
+                            No pending requests
                         </div>
-                        <button class="btn-end" id="endChatBtn"><i class="fas fa-times-circle"></i> End session</button>
                     </div>
-                    <div class="messages-wrap" id="messagesWrap"></div>
-                    <div class="input-area">
-                        <input type="text" id="agentInput" placeholder="Type a message…" autocomplete="off">
-                        <button id="agentSend"><i class="fas fa-paper-plane"></i></button>
+                </div>
+
+                <!-- Chat area -->
+                <div class="chat-area" id="chatArea">
+                    <div class="chat-placeholder" id="chatPlaceholder">
+                        <i class="fas fa-comments"></i>
+                        <p>Select a chat from the sidebar</p>
+                    </div>
+
+                    <div id="activeChat">
+                        <div class="chat-top">
+                            <div class="chat-top-info">
+                                <h3 id="activeChatName">User</h3>
+                                <p id="activeChatSub">Live chat</p>
+                            </div>
+                            <button class="btn-end" id="endChatBtn"><i class="fas fa-times-circle"></i> End session</button>
+                        </div>
+                        <div class="messages-wrap" id="messagesWrap"></div>
+                        <div class="input-area">
+                            <input type="text" id="agentInput" placeholder="Type a message…" autocomplete="off">
+                            <button id="agentSend"><i class="fas fa-paper-plane"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+
+    </div><!-- /.app-wrapper -->
 
     <script>
-        /* ══════════════════════════════════════════════════════════════
-           BROADCAST CHANNEL
-        ══════════════════════════════════════════════════════════════ */
         const CHANNEL = 'umbrellanet_livechat';
         const bc = new BroadcastChannel(CHANNEL);
 
-        /* ══════════════════════════════════════════════════════════════
-           STATE
-        ══════════════════════════════════════════════════════════════ */
         let agentName = '';
         let heartbeatTimer = null;
-        let activeChatId = null;   // userId currently open in the chat pane
+        let activeChatId = null;
 
-        // Map of userId → { userId, userName, lastMessage, time, status:'pending'|'live', messages:[] }
         const chats = {};
 
-        /* ══════════════════════════════════════════════════════════════
-           DOM REFS
-        ══════════════════════════════════════════════════════════════ */
-        const loginScreen = document.getElementById('loginScreen');
-        const agentPanel = document.getElementById('agentPanel');
+        const loginScreen   = document.getElementById('loginScreen');
+        const agentPanel    = document.getElementById('agentPanel');
         const agentNameInput = document.getElementById('agentNameInput');
-        const loginBtn = document.getElementById('loginBtn');
-        const topbarName = document.getElementById('topbarName');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const requestList = document.getElementById('requestList');
-        const emptyState = document.getElementById('emptyState');
+        const loginBtn      = document.getElementById('loginBtn');
+        const topbarName    = document.getElementById('topbarName');
+        const logoutBtn     = document.getElementById('logoutBtn');
+        const requestList   = document.getElementById('requestList');
+        const emptyState    = document.getElementById('emptyState');
         const chatPlaceholder = document.getElementById('chatPlaceholder');
-        const activeChatEl = document.getElementById('activeChat');
+        const activeChatEl  = document.getElementById('activeChat');
         const activeChatName = document.getElementById('activeChatName');
         const activeChatSub = document.getElementById('activeChatSub');
-        const messagesWrap = document.getElementById('messagesWrap');
-        const agentInput = document.getElementById('agentInput');
-        const agentSend = document.getElementById('agentSend');
-        const endChatBtn = document.getElementById('endChatBtn');
+        const messagesWrap  = document.getElementById('messagesWrap');
+        const agentInput    = document.getElementById('agentInput');
+        const agentSend     = document.getElementById('agentSend');
+        const endChatBtn    = document.getElementById('endChatBtn');
 
-        /* ══════════════════════════════════════════════════════════════
-           LOGIN
-        ══════════════════════════════════════════════════════════════ */
         function goOnline() {
             const name = agentNameInput.value.trim();
             if (!name) { agentNameInput.style.borderColor = '#ef4444'; return; }
@@ -675,8 +759,6 @@
             loginScreen.style.display = 'none';
             agentPanel.style.display = 'flex';
             topbarName.textContent = agentName;
-
-            // Announce presence
             broadcastOnline();
             heartbeatTimer = setInterval(broadcastOnline, 8000);
         }
@@ -684,9 +766,6 @@
         loginBtn.addEventListener('click', goOnline);
         agentNameInput.addEventListener('keypress', e => { if (e.key === 'Enter') goOnline(); });
 
-        /* ══════════════════════════════════════════════════════════════
-           LOGOUT
-        ══════════════════════════════════════════════════════════════ */
         logoutBtn.addEventListener('click', () => {
             bc.postMessage({ type: 'AGENT_OFFLINE', agentName });
             clearInterval(heartbeatTimer);
@@ -698,26 +777,17 @@
             Object.keys(chats).forEach(k => delete chats[k]);
             renderSidebar();
             showPlaceholder();
-        
-            // 👉 Redirect to index2.html
             window.location.href = "index2.html";
         });
 
-        /* ══════════════════════════════════════════════════════════════
-           HEARTBEAT
-        ══════════════════════════════════════════════════════════════ */
         function broadcastOnline() {
             bc.postMessage({ type: 'AGENT_ONLINE', agentName });
         }
 
-        /* ══════════════════════════════════════════════════════════════
-           BROADCAST CHANNEL — receive from index.html
-        ══════════════════════════════════════════════════════════════ */
         bc.onmessage = (e) => {
             const msg = e.data;
 
             if (msg.type === 'TRANSFER_REQUEST') {
-                // New incoming request
                 if (!chats[msg.userId]) {
                     chats[msg.userId] = {
                         userId: msg.userId,
@@ -750,9 +820,6 @@
             }
         };
 
-        /* ══════════════════════════════════════════════════════════════
-           SIDEBAR RENDERING
-        ══════════════════════════════════════════════════════════════ */
         function renderSidebar() {
             requestList.innerHTML = '';
             const entries = Object.values(chats).filter(c => c.status !== 'ended');
@@ -764,37 +831,30 @@
                 card.dataset.id = chat.userId;
 
                 card.innerHTML = `
-                <div class="rc-header">
-                    <span class="rc-name">${esc(chat.userName)}</span>
-                    <span class="rc-time">${chat.time}</span>
-                </div>
-                <div class="rc-preview">${esc(chat.lastMessage || '(no message)')}</div>
-                ${chat.status === 'pending' ? `
-                    <div class="rc-actions">
-                        <button class="btn-accept" data-id="${chat.userId}"><i class="fas fa-check"></i> Accept</button>
-                        <button class="btn-deny"   data-id="${chat.userId}"><i class="fas fa-times"></i> Deny</button>
+                    <div class="rc-header">
+                        <span class="rc-name">${esc(chat.userName)}</span>
+                        <span class="rc-time">${chat.time}</span>
                     </div>
-                ` : `
-                    <span class="rc-live-badge"><i class="fas fa-circle" style="font-size:8px"></i> Live</span>
-                `}
-            `;
+                    <div class="rc-preview">${esc(chat.lastMessage || '(no message)')}</div>
+                    ${chat.status === 'pending' ? `
+                        <div class="rc-actions">
+                            <button class="btn-accept" data-id="${chat.userId}"><i class="fas fa-check"></i> Accept</button>
+                            <button class="btn-deny"   data-id="${chat.userId}"><i class="fas fa-times"></i> Deny</button>
+                        </div>
+                    ` : `
+                        <span class="rc-live-badge"><i class="fas fa-circle" style="font-size:8px"></i> Live</span>
+                    `}
+                `;
 
-                // Accept / Deny
                 const acceptBtn = card.querySelector('.btn-accept');
-                const denyBtn = card.querySelector('.btn-deny');
+                const denyBtn   = card.querySelector('.btn-deny');
                 if (acceptBtn) acceptBtn.addEventListener('click', (ev) => { ev.stopPropagation(); acceptChat(chat.userId); });
-                if (denyBtn) denyBtn.addEventListener('click', (ev) => { ev.stopPropagation(); denyChat(chat.userId); });
-
-                // Click card to open chat
+                if (denyBtn)   denyBtn.addEventListener('click',   (ev) => { ev.stopPropagation(); denyChat(chat.userId); });
                 card.addEventListener('click', () => openChat(chat.userId));
-
                 requestList.appendChild(card);
             });
         }
 
-        /* ══════════════════════════════════════════════════════════════
-           ACCEPT / DENY
-        ══════════════════════════════════════════════════════════════ */
         function acceptChat(userId) {
             const chat = chats[userId];
             if (!chat) return;
@@ -814,9 +874,6 @@
             renderSidebar();
         }
 
-        /* ══════════════════════════════════════════════════════════════
-           OPEN CHAT PANE
-        ══════════════════════════════════════════════════════════════ */
         function openChat(userId) {
             const chat = chats[userId];
             if (!chat) return;
@@ -835,9 +892,6 @@
             activeChatEl.style.display = 'none';
         }
 
-        /* ══════════════════════════════════════════════════════════════
-           MESSAGES
-        ══════════════════════════════════════════════════════════════ */
         function renderMessages(userId) {
             const chat = chats[userId];
             if (!chat) return;
@@ -852,10 +906,10 @@
                     const d = document.createElement('div');
                     d.className = `msg ${m.from === 'user' ? 'msg-user' : 'msg-agent'}`;
                     d.innerHTML = `
-                    <div class="msg-label">${m.from === 'user' ? esc(chat.userName) : esc(agentName)}</div>
-                    ${esc(m.text)}
-                    <div class="msg-ts">${m.time}</div>
-                `;
+                        <div class="msg-label">${m.from === 'user' ? esc(chat.userName) : esc(agentName)}</div>
+                        ${esc(m.text)}
+                        <div class="msg-ts">${m.time}</div>
+                    `;
                     messagesWrap.appendChild(d);
                 }
             });
@@ -867,15 +921,11 @@
             chats[userId].messages.push({ system: true, text: html });
         }
 
-        /* ══════════════════════════════════════════════════════════════
-           SEND MESSAGE (agent → user)
-        ══════════════════════════════════════════════════════════════ */
         function sendAgentMessage() {
             const text = agentInput.value.trim();
             if (!text || !activeChatId) return;
             const chat = chats[activeChatId];
             if (!chat || chat.status !== 'live') return;
-
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             chat.messages.push({ from: 'agent', text, time });
             bc.postMessage({ type: 'AGENT_MSG', userId: activeChatId, agentName, text });
@@ -887,9 +937,6 @@
         agentSend.addEventListener('click', sendAgentMessage);
         agentInput.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAgentMessage(); } });
 
-        /* ══════════════════════════════════════════════════════════════
-           END SESSION
-        ══════════════════════════════════════════════════════════════ */
         endChatBtn.addEventListener('click', () => {
             if (!activeChatId) return;
             bc.postMessage({ type: 'AGENT_EXIT', userId: activeChatId, agentName });
@@ -900,26 +947,20 @@
             showPlaceholder();
         });
 
-        /* ══════════════════════════════════════════════════════════════
-           TOAST NOTIFICATION
-        ══════════════════════════════════════════════════════════════ */
         function showToast(userName, preview) {
             const toast = document.createElement('div');
             toast.className = 'toast';
             toast.innerHTML = `
-            <i class="fas fa-comment-dots"></i>
-            <div class="toast-body">
-                <p>New request from ${esc(userName)}</p>
-                <p>${esc((preview || '').substring(0, 60))}</p>
-            </div>
-        `;
+                <i class="fas fa-comment-dots"></i>
+                <div class="toast-body">
+                    <p>New request from ${esc(userName)}</p>
+                    <p>${esc((preview || '').substring(0, 60))}</p>
+                </div>
+            `;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 5000);
         }
 
-        /* ══════════════════════════════════════════════════════════════
-           UTILITY
-        ══════════════════════════════════════════════════════════════ */
         function esc(str) {
             return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
