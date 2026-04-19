@@ -17,6 +17,8 @@
     }
     body{margin:0;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
     .app{display:grid;grid-template-columns:260px 280px 1fr;height:100vh;}
+
+    /* ── Sidebar ── */
     .sidebar{background:var(--card);border-right:1px solid #333;display:flex;flex-direction:column;padding:20px;overflow:hidden;}
     .brand{display:flex;gap:12px;align-items:center;margin-bottom:20px}
     .logo{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
@@ -24,29 +26,33 @@
     .nav{display:flex;flex-direction:column;gap:8px;margin-top:10px;overflow-y:auto;}
     .nav a{color:var(--text);text-decoration:none;padding:10px;border-radius:8px}
     .nav a:hover{background:var(--muted)}.nav a.active{background:var(--primary);color:white}
-    .sidebar-footer{margin-top:auto;font-size:12px;color:#888;padding-top:12px;border-top:1px solid #333;}
-    .sidebar-footer span{display:block;margin-bottom:4px;}
+    .new-chat{margin-top:auto;}
+    .new-chat input{width:100%;padding:8px;border-radius:8px;border:1px solid #444;background:var(--bg);color:var(--text);margin-bottom:8px;box-sizing:border-box;}
+    .new-chat button{width:100%;padding:8px;border-radius:8px;border:0;background:var(--primary);color:white;cursor:pointer}
+
+    /* ── Session list ── */
     .chat-list{background:var(--card);border-right:1px solid #333;display:flex;flex-direction:column;overflow:hidden;}
-    .chat-list-header{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px;}
+    .chat-list-header{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px;flex-shrink:0;}
     .chat-list-header h2{font-size:16px;margin:0;}
     .refresh-btn{background:none;border:1px solid #444;color:var(--text);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;}
     .refresh-btn:hover{background:var(--muted);}
     .chat-list-scroll{overflow-y:auto;flex:1;}
     .chat-item{padding:12px 16px;border-bottom:1px solid #333;cursor:pointer;display:flex;flex-direction:column;}
     .chat-item:hover{background:var(--muted)}.chat-item.active{background:var(--primary);color:white}
-    .chat-name{font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:6px;}
+    .chat-name{font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
     .session-badge{font-size:10px;background:#333;color:#aaa;padding:1px 5px;border-radius:4px;font-weight:400;}
     .chat-item.active .session-badge{background:rgba(255,255,255,0.2);color:#eee;}
     .chat-preview{font-size:13px;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .chat-item.active .chat-preview{color:#ddd;}
-    .chat-time{font-size:11px;color:#999;align-self:flex-end;margin-top:2px;}
+    .chat-time{font-size:11px;color:#999;align-self:flex-end;}
     .chat-item.active .chat-time{color:#ddd;}
+
+    /* ── Main area ── */
     .main{display:flex;flex-direction:column;overflow:hidden;}
     .topbar{background:var(--card);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;flex-shrink:0;}
     .topbar nav{display:flex;gap:20px}
     .topbar nav a{color:var(--text);text-decoration:none;font-weight:500}
     .topbar nav a:hover{color:var(--accent)}
-    .topbar-meta{font-size:12px;color:#888;}
     .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
     .chat-main{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#211f38,#1c1a2e)}
     .message{max-width:70%;padding:12px 14px;border-radius:12px;line-height:1.4;word-wrap:break-word;overflow-wrap:break-word;}
@@ -54,371 +60,264 @@
     .bot{align-self:flex-end;background:var(--accent);color:white}
     .composer{display:flex;gap:10px;padding:14px;border-top:1px solid #333;align-items:center;background:var(--card);flex-shrink:0;}
     .composer input{flex:1;padding:10px 12px;border-radius:10px;border:1px solid #444;background:var(--bg);color:var(--text)}
-    .composer input:disabled{opacity:0.5;cursor:not-allowed;}
     .composer button.send{background:var(--primary);color:white;border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
-    .composer button.send:disabled{opacity:0.5;cursor:not-allowed;}
+
+    /* ── Misc ── */
     .status-message{text-align:center;color:#aaa;font-style:italic;margin:10px 0;}
-    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:#666;}
-    .empty-state svg{opacity:0.3;}
+    .message-status{font-size:11px;margin-top:4px;text-align:right;}
     .date-divider{text-align:center;color:#aaa;font-size:12px;margin:16px 0;position:relative;}
     .date-divider::before,.date-divider::after{content:'';position:absolute;top:50%;width:30%;height:1px;background:#444;}
     .date-divider::before{left:0;}.date-divider::after{right:0;}
     .logo-img{width:60px;height:60px;object-fit:contain;}
-    .role-label{font-size:10px;color:#888;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px;}
-    .message-time{font-size:11px;color:#999;margin-top:4px;text-align:right;}
-    .bot .message-time{color:rgba(255,255,255,0.6);}
-    .loading-dots{display:inline-flex;gap:4px;align-items:center;}
-    .loading-dots span{width:6px;height:6px;border-radius:50%;background:#888;animation:dot-bounce 1.4s infinite ease-in-out;}
-    .loading-dots span:nth-child(2){animation-delay:0.2s;}
-    .loading-dots span:nth-child(3){animation-delay:0.4s;}
-    @keyframes dot-bounce{0%,80%,100%{transform:scale(0.8);opacity:0.5;}40%{transform:scale(1.2);opacity:1;}}
-    .session-info-bar{background:#1e1c35;border-bottom:1px solid #2e2c4a;padding:8px 20px;font-size:12px;color:#888;display:flex;gap:16px;}
-    .session-info-bar span{display:flex;align-items:center;gap:4px;}
-    .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
-    @media (max-width:1000px){.app{grid-template-columns:1fr;}}
+    .role-label{font-size:10px;opacity:.65;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;}
+    .loading-dots{display:flex;gap:4px;align-items:center;justify-content:center;padding:24px;}
+    .loading-dots span{width:7px;height:7px;border-radius:50%;background:#888;animation:db 1.4s infinite ease-in-out;}
+    .loading-dots span:nth-child(2){animation-delay:.2s;}
+    .loading-dots span:nth-child(3){animation-delay:.4s;}
+    @keyframes db{0%,80%,100%{transform:scale(.8);opacity:.4;}40%{transform:scale(1.2);opacity:1;}}
+    @media(max-width:1000px){.app{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
-  <div class="app">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="logo">
-          <img src="img/logo.svg" alt="" class="logo-img">
-        </div>
-        <div>
-          <h1 style="color:#fff;">UmbrellaNet</h1>
-          <div style="font-size:12px;color:white">Admin Dashboard</div>
-        </div>
-      </div>
-      <nav class="nav">
-        <a href="chats.html" class="active">Chats</a>
-        <a href="analytics.html">Analytics</a>
-        <a href="index2.html">Dashboard</a>
-      </nav>
-      <div class="sidebar-footer">
-        <span>📡 Redis: quiet-snapper-78920</span>
-        <span>🔑 Session-based storage</span>
-      </div>
-    </aside>
+<div class="app">
 
-    <!-- Chat list -->
-    <aside class="chat-list">
-      <div class="chat-list-header">
-        <h2>Sessions</h2>
-        <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo"><img src="img/logo.svg" alt="" class="logo-img"></div>
+      <div>
+        <h1 style="color:#fff;">UmbrellaNet</h1>
+        <div style="font-size:12px;color:white">Admin Dashboard</div>
       </div>
-      <div class="chat-list-scroll" id="chatList">
-        <div class="status-message">
-          <div class="loading-dots"><span></span><span></span><span></span></div>
-        </div>
-      </div>
-    </aside>
+    </div>
+    <nav class="nav">
+      <a href="chats.html" class="active">Chats</a>
+      <a href="analytics.html">Analytics</a>
+      <a href="index2.html">Dashboard</a>
+    </nav>
+    <div class="new-chat">
+      <input id="findInput" placeholder="Find session by ID" />
+      <button id="findBtn">Find Session</button>
+    </div>
+  </aside>
 
-    <!-- Main -->
-    <div class="main">
-      <div class="topbar">
-        <strong id="chatTitle">Select a session</strong>
-        <div class="topbar-meta" id="topbarMeta"></div>
-      </div>
-      <div id="sessionInfoBar" class="session-info-bar" style="display:none;"></div>
-      <div class="chat-area">
-        <section class="chat-main" id="chatMain">
-          <div class="empty-state">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            <div>Select a session to view messages</div>
-          </div>
-        </section>
-        <div class="composer">
-          <input id="chatInput" placeholder="Select a session to reply…" disabled />
-          <button class="send" id="sendBtn" disabled>Send</button>
-        </div>
+  <!-- ── Session list ── -->
+  <aside class="chat-list">
+    <div class="chat-list-header">
+      <h2>Active Sessions</h2>
+      <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+    </div>
+    <div class="chat-list-scroll" id="chatList">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main">
+    <div class="topbar"><strong id="chatTitle">Sessions</strong></div>
+    <div class="chat-area">
+      <section class="chat-main" id="chatMain">
+        <div class="status-message" style="margin-top:60px;">Select a session to view messages</div>
+      </section>
+      <div class="composer">
+        <input id="chatInput" placeholder="Select a session to view messages" disabled />
+        <button class="send" id="sendBtn" disabled>Send</button>
       </div>
     </div>
   </div>
 
-  <script>
-    // ─── CONFIG ──────────────────────────────────────────────
-    // Uses the Python backend's Upstash instance (from screenshot)
-    const CONFIG = {
-      upstash: {
-        endpoint: "https://quiet-snapper-78920.upstash.io",
-        token: "gQAAAAAAATRIAAIncDFmMTQwZmQyMTcyNDY0MWNkYmZkOGY0MDM3Mjl1jODM3N3AxNzg5MjA"
+</div>
+<script>
+  // ─── CONFIG ──────────────────────────────────────────────────────────────────
+  const CONFIG = {
+    upstash: {
+      endpoint: "https://quiet-snapper-78920.upstash.io",
+      // Token cleaned from screenshot: removed leading "* ", fixed @ → 0 twice
+      token: "gQAAAAAAATRIAAIncDFmMTQwZm2yMTcyNDY0MWNkYmZk0GY0MDM3Mj1jODM3N3AxNzg5MjA"
+    }
+  };
+
+  // Python backend key format: umbrellanet_chat_{ipHash16}_{sessionId}
+  // Storage: Redis LIST via RPUSH. Each element is JSON: { role, text, timestamp? }
+  // First 2 items are system-prompt bootstrap → skip them
+  const BOOTSTRAP = 2;
+
+  const $chatMain  = document.getElementById('chatMain');
+  const $chatInput = document.getElementById('chatInput');
+  const $sendBtn   = document.getElementById('sendBtn');
+  const $chatList  = document.getElementById('chatList');
+  const $chatTitle = document.getElementById('chatTitle');
+  const $refresh   = document.getElementById('refreshBtn');
+  const $findInput = document.getElementById('findInput');
+  const $findBtn   = document.getElementById('findBtn');
+
+  let sessions    = {};   // key → turns[]
+  let currentKey  = null;
+
+  // ─── Upstash REST ─────────────────────────────────────────────────────────────
+  async function upstash(path) {
+    const res = await fetch(CONFIG.upstash.endpoint + path, {
+      headers: { Authorization: `Bearer ${CONFIG.upstash.token}` }
+    });
+    if (!res.ok) throw new Error(`Upstash ${res.status}: ${await res.text()}`);
+    return res.json();
+  }
+
+  async function scanKeys(pattern) {
+    let all = [], cursor = '0';
+    do {
+      const j = await upstash(`/scan/${cursor}?match=${encodeURIComponent(pattern)}&count=100`);
+      cursor = j.result[0];
+      all.push(...(j.result[1] || []));
+    } while (cursor !== '0');
+    return [...new Set(all)];
+  }
+
+  async function fetchList(key) {
+    const j = await upstash(`/lrange/${encodeURIComponent(key)}/0/-1`);
+    return (j.result || []).map(s => { try { return JSON.parse(s); } catch { return null; } }).filter(Boolean);
+  }
+
+  // ─── Key helpers ──────────────────────────────────────────────────────────────
+  function parseKey(key) {
+    const s = key.replace(/^umbrellanet_chat_/, '');
+    const m = s.match(/^([0-9a-f]{16})_(.+)$/i);
+    return m ? { ipHash: m[1], sessionId: m[2] } : { ipHash: 'unknown', sessionId: s };
+  }
+
+  // ─── Load all sessions ────────────────────────────────────────────────────────
+  async function loadSessions() {
+    $chatList.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
+    sessions = {};
+    try {
+      const keys = await scanKeys('umbrellanet_chat_*');
+      if (!keys.length) { $chatList.innerHTML = '<div class="status-message">No sessions found</div>'; return; }
+
+      const results = await Promise.allSettled(keys.map(async k => ({ key: k, turns: await fetchList(k) })));
+      $chatList.innerHTML = '';
+
+      const valid = results
+        .filter(r => r.status === 'fulfilled' && r.value.turns.length > BOOTSTRAP)
+        .map(r => r.value);
+
+      if (!valid.length) { $chatList.innerHTML = '<div class="status-message">No sessions with messages</div>'; return; }
+
+      valid.forEach(({ key, turns }) => { sessions[key] = turns; addToList(key, turns); });
+
+      // Auto-select first item
+      const first = $chatList.querySelector('.chat-item');
+      if (first) switchSession(first.dataset.key, first);
+
+    } catch (err) {
+      console.error(err);
+      $chatList.innerHTML = `<div class="status-message">Error: ${err.message}</div>`;
+    }
+  }
+
+  // ─── Add item to session list ─────────────────────────────────────────────────
+  function addToList(key, turns) {
+    const { ipHash, sessionId } = parseKey(key);
+    const real    = turns.slice(BOOTSTRAP);
+    const last    = real[real.length - 1];
+    const preview = last?.text ? (last.text.length > 32 ? last.text.slice(0, 32) + '…' : last.text) : 'No messages';
+
+    const item = document.createElement('div');
+    item.className   = 'chat-item';
+    item.dataset.key = key;
+    item.innerHTML   = `
+      <div class="chat-name">
+        ${esc(sessionId)}
+        <span class="session-badge">${real.length} msg</span>
+      </div>
+      <div class="chat-preview">${esc(preview)}</div>
+      <div class="chat-time">IP: ${ipHash.slice(0,8)}…</div>
+    `;
+    item.addEventListener('click', () => switchSession(key, item));
+    $chatList.appendChild(item);
+  }
+
+  // ─── Render session messages ──────────────────────────────────────────────────
+  function renderSession(key) {
+    $chatMain.innerHTML = '';
+    const turns = (sessions[key] || []).slice(BOOTSTRAP);
+    const { sessionId } = parseKey(key);
+
+    if (!turns.length) {
+      $chatMain.innerHTML = '<div class="status-message">No messages in this session</div>';
+      return;
+    }
+
+    let lastDate = null;
+    turns.forEach(turn => {
+      if (!turn?.text) return;
+      const isUser  = turn.role === 'user';
+      const cls     = isUser ? 'user' : 'bot';
+      const dateStr = turn.timestamp ? new Date(turn.timestamp).toDateString() : new Date().toDateString();
+
+      if (lastDate !== dateStr) {
+        const d = document.createElement('div');
+        d.className   = 'date-divider';
+        d.textContent = dateLabel(dateStr);
+        $chatMain.appendChild(d);
+        lastDate = dateStr;
       }
-    };
 
-    // ─── Key format from Python backend:
-    //   umbrellanet_chat_{ip_hash_16chars}_{session_id}
-    //   stored as a Redis LIST (RPUSH), each item is a JSON string
-    //   with shape: { role: "user"|"model", text: "..." }
-    //   The first two items are always the system-prompt bootstrap (skip them)
+      const timeStr = turn.timestamp
+        ? new Date(turn.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : '';
 
-    const SYSTEM_BOOTSTRAP_TURNS = 2; // skip first 2 list items (system prompt bootstrap)
-
-    const chatMain   = document.getElementById('chatMain');
-    const chatInput  = document.getElementById('chatInput');
-    const sendBtn    = document.getElementById('sendBtn');
-    const chatList   = document.getElementById('chatList');
-    const chatTitle  = document.getElementById('chatTitle');
-    const topbarMeta = document.getElementById('topbarMeta');
-    const sessionBar = document.getElementById('sessionInfoBar');
-    const refreshBtn = document.getElementById('refreshBtn');
-
-    let sessions     = {};   // key → array of turn objects
-    let currentKey   = null;
-
-    // ─── UPSTASH HELPERS ─────────────────────────────────────
-
-    async function upstashFetch(path, opts = {}) {
-      const url = `${CONFIG.upstash.endpoint}${path}`;
-      const res = await fetch(url, {
-        ...opts,
-        headers: {
-          Authorization: `Bearer ${CONFIG.upstash.token}`,
-          'Content-Type': 'application/json',
-          ...(opts.headers || {})
-        }
-      });
-      if (!res.ok) throw new Error(`Upstash ${res.status}: ${res.statusText}`);
-      return res.json();
-    }
-
-    async function scanKeys(pattern = "umbrellanet_chat_*") {
-      let allKeys = [];
-      let cursor  = '0';
-      do {
-        const json = await upstashFetch(
-          `/scan/${cursor}?match=${encodeURIComponent(pattern)}&count=100`
-        );
-        cursor = json.result[0];
-        allKeys.push(...(json.result[1] || []));
-      } while (cursor !== '0');
-      return [...new Set(allKeys)];
-    }
-
-    // Fetch all items from a Redis list
-    async function fetchList(key) {
-      const encoded = encodeURIComponent(key);
-      const json    = await upstashFetch(`/lrange/${encoded}/0/-1`);
-      const raw     = json.result || [];
-      return raw.map(item => {
-        try { return JSON.parse(item); }
-        catch { return null; }
-      }).filter(Boolean);
-    }
-
-    // ─── KEY PARSING ─────────────────────────────────────────
-    // Key format: umbrellanet_chat_{ipHash16}_{sessionId}
-    function parseKey(key) {
-      // Remove prefix
-      const stripped = key.replace(/^umbrellanet_chat_/, '');
-      // ip hash is first 16 hex chars, then underscore, rest is session_id
-      const match = stripped.match(/^([0-9a-f]{16})_(.+)$/i);
-      if (match) {
-        return { ipHash: match[1], sessionId: match[2] };
-      }
-      // Fallback
-      return { ipHash: 'unknown', sessionId: stripped };
-    }
-
-    function shortIp(hash) {
-      return hash.substring(0, 8) + '…';
-    }
-
-    // ─── LOAD ALL SESSIONS ───────────────────────────────────
-
-    async function loadSessions() {
-      chatList.innerHTML = `<div class="status-message"><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
-      sessions = {};
-
-      try {
-        const keys = await scanKeys("umbrellanet_chat_*");
-
-        if (keys.length === 0) {
-          chatList.innerHTML = '<div class="status-message">No sessions found</div>';
-          return;
-        }
-
-        // Fetch all sessions in parallel
-        const results = await Promise.allSettled(
-          keys.map(async key => {
-            const turns = await fetchList(key);
-            return { key, turns };
-          })
-        );
-
-        chatList.innerHTML = '';
-
-        // Sort by most recent message first
-        const valid = results
-          .filter(r => r.status === 'fulfilled' && r.value.turns.length > SYSTEM_BOOTSTRAP_TURNS)
-          .map(r => r.value)
-          .sort((a, b) => {
-            const lastA = a.turns[a.turns.length - 1]?.timestamp || 0;
-            const lastB = b.turns[b.turns.length - 1]?.timestamp || 0;
-            return lastB - lastA;
-          });
-
-        if (valid.length === 0) {
-          chatList.innerHTML = '<div class="status-message">No sessions with messages</div>';
-          return;
-        }
-
-        valid.forEach(({ key, turns }) => {
-          sessions[key] = turns;
-          addSessionToList(key, turns);
-        });
-
-        // Auto-select first
-        const first = chatList.querySelector('.chat-item');
-        if (first) switchSession(first.dataset.key, first);
-
-      } catch (err) {
-        console.error('Load error:', err);
-        chatList.innerHTML = `<div class="status-message">Error: ${err.message}</div>`;
-      }
-    }
-
-    // ─── RENDER SESSION LIST ITEM ─────────────────────────────
-
-    function addSessionToList(key, turns) {
-      const { ipHash, sessionId } = parseKey(key);
-
-      // Real turns (skip bootstrap)
-      const real = turns.slice(SYSTEM_BOOTSTRAP_TURNS);
-      const last = real[real.length - 1];
-
-      const preview  = last?.text
-        ? (last.text.length > 35 ? last.text.substring(0, 35) + '…' : last.text)
-        : 'No messages';
-
-      const msgCount = real.length;
-
-      const item = document.createElement('div');
-      item.className  = 'chat-item';
-      item.dataset.key = key;
-      item.innerHTML  = `
-        <div class="chat-name">
-          <span>Session: ${sessionId}</span>
-          <span class="session-badge">${msgCount} msg${msgCount !== 1 ? 's' : ''}</span>
-        </div>
-        <div class="chat-preview">${escapeHtml(preview)}</div>
-        <div class="chat-time">IP: ${shortIp(ipHash)}</div>
+      const div = document.createElement('div');
+      div.className = `message ${cls}`;
+      div.innerHTML = `
+        <div class="role-label">${isUser ? '👤 User' : '🤖 Assistant'}</div>
+        ${esc(turn.text)}
+        <div class="message-status" style="color:${isUser ? '#999' : 'rgba(255,255,255,0.6)'};">${timeStr}</div>
       `;
-      item.addEventListener('click', () => switchSession(key, item));
-      chatList.appendChild(item);
+      $chatMain.appendChild(div);
+    });
+
+    $chatTitle.textContent = `Session: ${sessionId}`;
+    $chatMain.scrollTop = $chatMain.scrollHeight;
+  }
+
+  // ─── Switch session ───────────────────────────────────────────────────────────
+  function switchSession(key, item) {
+    document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
+    item.classList.add('active');
+    currentKey = key;
+    renderSession(key);
+  }
+
+  // ─── Find session ─────────────────────────────────────────────────────────────
+  $findBtn.addEventListener('click', () => {
+    const val = $findInput.value.trim();
+    if (!val) return;
+    const match = Object.keys(sessions).find(k => parseKey(k).sessionId === val);
+    if (match) {
+      const item = $chatList.querySelector(`.chat-item[data-key="${CSS.escape(match)}"]`);
+      if (item) switchSession(match, item);
+    } else {
+      alert(`No session found with ID: ${val}`);
     }
+    $findInput.value = '';
+  });
+  $findInput.addEventListener('keypress', e => { if (e.key === 'Enter') $findBtn.click(); });
 
-    // ─── RENDER CHAT MESSAGES ─────────────────────────────────
+  // ─── Utils ───────────────────────────────────────────────────────────────────
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function dateLabel(ds) {
+    const today = new Date().toDateString();
+    const yest  = new Date(Date.now()-86400000).toDateString();
+    if (ds === today) return 'Today';
+    if (ds === yest)  return 'Yesterday';
+    return new Date(ds).toLocaleDateString([],{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  }
 
-    function renderSession(key) {
-      chatMain.innerHTML = '';
-      const allTurns = sessions[key] || [];
-
-      // Skip the 2 bootstrap turns (system prompt exchange)
-      const turns = allTurns.slice(SYSTEM_BOOTSTRAP_TURNS);
-
-      if (turns.length === 0) {
-        chatMain.innerHTML = '<div class="status-message">No real messages in this session</div>';
-        return;
-      }
-
-      const { ipHash, sessionId } = parseKey(key);
-
-      // Session info bar
-      sessionBar.style.display = 'flex';
-      sessionBar.innerHTML = `
-        <span><span class="dot"></span> Active</span>
-        <span>Session ID: <strong>${sessionId}</strong></span>
-        <span>IP Hash: <code>${ipHash}</code></span>
-        <span>${turns.length} messages</span>
-      `;
-
-      let lastDate = null;
-
-      turns.forEach(turn => {
-        if (!turn || !turn.text) return;
-
-        const isUser = turn.role === 'user';
-        const cls    = isUser ? 'user' : 'bot';
-
-        // Date divider
-        const msgDate = turn.timestamp
-          ? new Date(turn.timestamp).toDateString()
-          : new Date().toDateString();
-
-        if (lastDate !== msgDate) {
-          const divider = document.createElement('div');
-          divider.className   = 'date-divider';
-          divider.textContent = formatDateLabel(msgDate);
-          chatMain.appendChild(divider);
-          lastDate = msgDate;
-        }
-
-        const div = document.createElement('div');
-        div.className = `message ${cls}`;
-
-        const timeStr = turn.timestamp
-          ? new Date(turn.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          : '';
-
-        div.innerHTML = `
-          <div class="role-label">${isUser ? '👤 User' : '🤖 Assistant'}</div>
-          <div>${escapeHtml(turn.text)}</div>
-          ${timeStr ? `<div class="message-time">${timeStr}</div>` : ''}
-        `;
-        chatMain.appendChild(div);
-      });
-
-      chatMain.scrollTop = chatMain.scrollHeight;
-
-      // Update header
-      chatTitle.textContent = `Session: ${sessionId}`;
-      topbarMeta.textContent = `${turns.length} messages`;
-
-      // Enable composer (read-only view — composing not applicable for session chats)
-      // We'll keep it disabled with a note since sessions are IP-based and we can't reply
-      chatInput.disabled    = true;
-      chatInput.placeholder = 'Session chats are read-only (IP-based sessions)';
-      sendBtn.disabled      = true;
-    }
-
-    // ─── SWITCH SESSION ───────────────────────────────────────
-
-    function switchSession(key, item) {
-      document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
-      item.classList.add('active');
-      currentKey = key;
-      renderSession(key);
-    }
-
-    // ─── UTILITIES ────────────────────────────────────────────
-
-    function escapeHtml(str) {
-      return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function formatDateLabel(dateStr) {
-      const today     = new Date().toDateString();
-      const yesterday = new Date(Date.now() - 86400000).toDateString();
-      if (dateStr === today) return 'Today';
-      if (dateStr === yesterday) return 'Yesterday';
-      return new Date(dateStr).toLocaleDateString([], {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-      });
-    }
-
-    // ─── INIT ─────────────────────────────────────────────────
-
-    refreshBtn.addEventListener('click', loadSessions);
-    loadSessions();
-  </script>
+  // ─── Init ─────────────────────────────────────────────────────────────────────
+  $refresh.addEventListener('click', loadSessions);
+  loadSessions();
+</script>
 </body>
 </html>
