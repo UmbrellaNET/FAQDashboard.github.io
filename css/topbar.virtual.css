@@ -114,7 +114,7 @@
 .page-home .badge {
   padding: 16px 24px;
   background-color: rgba(16, 12, 61, 0.15);
-  color: #1b00ff;
+  color: #CE3EC0;
   text-shadow: 0 2px 4px rgba(23, 25, 37, 0.4);
   font-size: 16px;
   border-radius: 40px;
@@ -401,7 +401,7 @@
 
 .post-grid .post-category {
   font-weight: 500;
-  color: #1b00ff;
+  color: #CE3EC0;
   text-decoration: none;
 }
 
@@ -498,27 +498,27 @@
 /* Theme Red */
 .theme-red .badge-subhead {
   background-color: rgba(239, 56, 36, 0.15);
-  color: #1b00ff;
+  color: #CE3EC0;
 }
 
 .theme-red .filterable-button .btn.selected,
 .theme-red .filterable-button .btn:focus {
-  background-color: #1b00ff;
+  background-color: #CE3EC0;
   color: #fff;
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1b00ff;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #CE3EC0;
 }
 
 .theme-red .page-about .img-place::before {
-  border-color: #1b00ff;
+  border-color: #CE3EC0;
 }
 
 .theme-red .timeline li:first-child .title {
-  background-color: #1b00ff;
+  background-color: #CE3EC0;
 }
 
 .theme-red .timeline li:first-child::before {
-  background-color: #1b00ff;
-  box-shadow: 0 0 0 2px #1b00ff;
+  background-color: #CE3EC0;
+  box-shadow: 0 0 0 2px #CE3EC0;
 }
 
 /* Theme Blue */
