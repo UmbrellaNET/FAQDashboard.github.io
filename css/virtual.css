@@ -28,7 +28,7 @@
  */
 
 :root {
-    --theme-red: #1b00ff;
+    --theme-red: #CE3EC0;
     --theme-blue: #2960f7;
     --theme-green: #8cc63f;
     --theme-orange: #fd7e14;
@@ -337,11 +337,11 @@ a:hover, a:active {
 */
 
 .bg-theme-gradient {
-    background-image: linear-gradient(to right, #1b00ff 0%, #8490ff 100%) !important;
+    background-image: linear-gradient(to right, #CE3EC0 0%, #8490ff 100%) !important;
 }
 
 .bg-theme-red {
-    background-color: #1b00ff !important;
+    background-color: #CE3EC0 !important;
 }
 
 .bg-theme-blue {
@@ -361,7 +361,7 @@ a:hover, a:active {
 }
 
 .fg-theme-red {
-    color: #1b00ff !important;
+    color: #CE3EC0 !important;
 }
 
 .fg-theme-blue {
@@ -406,12 +406,12 @@ a:hover, a:active {
 
 .bg-pinterest,
 .bg-hover-pinterest:hover {
-    background-color: #1b00ff !important;
+    background-color: #CE3EC0 !important;
 }
 
 .bg-google-plus,
 .bg-hover-google-plus:hover {
-    background-color: #1b00ff !important;
+    background-color: #CE3EC0 !important;
 }
 
 .bg-behance,
@@ -442,7 +442,7 @@ a:hover, a:active {
 
 .bg-reddit,
 .bg-hover-reddit:hover {
-    background-color: #1b00ff !important;
+    background-color: #CE3EC0 !important;
 }
 
 .bg-snapchat,
@@ -457,7 +457,7 @@ a:hover, a:active {
 
 .bg-youtube,
 .bg-hover-youtube:hover {
-    background-color: #1b00ff !important;
+    background-color: #CE3EC0 !important;
 }
 
 /* 
@@ -1122,63 +1122,63 @@ a:hover, a:active {
 
 /* Theme red */
 .theme-red .bg-theme {
-    background-color: #1b00ff !important;
+    background-color: #CE3EC0 !important;
 }
 
 .theme-red .fg-theme {
-    color: #1b00ff !important;
+    color: #CE3EC0 !important;
 }
 
 .theme-red .btn-theme {
-    background-color: #1b00ff;
+    background-color: #CE3EC0;
     color: #fff;
 }
 
 .theme-red .btn-theme:hover {
-    background-color: #1b00ff;
+    background-color: #CE3EC0;
     color: #fff;
 }
 
 .theme-red .btn-theme:focus {
-    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #1b00ff;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #CE3EC0;
 }
 
 .theme-red .btn-theme-outline {
-    color: #1b00ff;
-    box-shadow: 0 0 0 2px #1b00ff;
+    color: #CE3EC0;
+    box-shadow: 0 0 0 2px #CE3EC0;
 }
 
 .theme-red .btn-theme-outline:hover {
-    background-color: #1b00ff;
+    background-color: #CE3EC0;
     color: #fff;
 }
 
 .theme-red .btn-theme-outline:focus {
-    background-color: #1b00ff;
+    background-color: #CE3EC0;
     color: #fff;
-    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #1b00ff;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #CE3EC0;
 }
 
 .theme-red .btn-fab {
-    background-color: #1b00ff;
+    background-color: #CE3EC0;
     color: #fff;
 }
 
 .theme-red .btn-fab:hover {
-    background-color: #1b00ff;
+    background-color: #CE3EC0;
     color: #fff;
 }
 
 .theme-red .progress {
-    box-shadow: 0 0 0 2px #1b00ff;
+    box-shadow: 0 0 0 2px #CE3EC0;
 }
 
 .theme-red .progress-bar {
-    background-color: #1b00ff;
+    background-color: #CE3EC0;
 }
 
 .theme-red .theme-list li::before {
-    border-color: #1b00ff;
+    border-color: #CE3EC0;
 }
 
 
