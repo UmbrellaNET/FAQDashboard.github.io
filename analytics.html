@@ -367,11 +367,7 @@
         updateChart(stats.monthlyData);
         updateInsights(stats);
 
-        // Warn if timestamps are missing
-        if (stats.missingTimestamps > 0) {
-          noTsWarning.style.display = 'block';
-          noTsWarning.textContent   = `⚠️ ${stats.missingTimestamps} message(s) had no timestamp and were counted under today's month. Add a timestamp field to your messages for accurate charts.`;
-        }
+        
 
         connectionStatus.style.display = 'block';
         lastUpdatedElem.textContent     = new Date().toLocaleTimeString();
