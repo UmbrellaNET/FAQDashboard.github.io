@@ -762,6 +762,7 @@
         
           async function refreshMissedBadge() {
             try {
+                refreshMissedBadge();
               // Total missed requests
               const lenRes  = await upstash('/llen/umbrellanet_missed_requests');
               const total   = lenRes.result || 0;
@@ -786,8 +787,8 @@
             if (ev.data?.type === 'MISSED_REQUEST') refreshMissedBadge();
           };
         
-          refreshMissedBadge();
-          setInterval(refreshMissedBadge, 60000); // re-check every minute
+          
+          setInterval(refreshMissedBadge, 15000); // re-check every 15 seconds
         })();
 
         /* ── LOGIN / LOGOUT ── */
