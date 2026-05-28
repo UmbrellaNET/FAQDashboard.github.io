@@ -748,7 +748,7 @@
             // If 'denied', fall through silently — toast still shows in-app.
         }
 
-        // ── Missed requests badge ────────────────────────────────────
+        // ── Missed requests badge (all pages) ────────────────────────────────────
         (async function () {
           const UPSTASH_URL   = 'https://quiet-snapper-78920.upstash.io';
           const UPSTASH_TOKEN = 'gQAAAAAAATRIAAIncDFmMTQwZmQyMTcyNDY0MWNkYmZkOGY0MDM3MjljODM3N3AxNzg5MjA';
@@ -762,15 +762,10 @@
         
           async function refreshMissedBadge() {
             try {
-                refreshMissedBadge();
-              // Total missed requests
               const lenRes  = await upstash('/llen/umbrellanet_missed_requests');
               const total   = lenRes.result || 0;
-        
-              // Seen IDs
               const seenRes = await upstash('/smembers/umbrellanet_missed_seen');
               const seen    = (seenRes.result || []).length;
-        
               const unseen  = Math.max(0, total - seen);
               const badge   = document.getElementById('missedBadge');
               if (!badge) return;
@@ -781,16 +776,24 @@
             }
           }
         
-          // Listen for real-time pushes from the chat widget
+          // Run immediately on every page load/reload
+          refreshMissedBadge();
+        
+          // Re-check every 15 seconds
+          setInterval(refreshMissedBadge, 15000);
+        
+          // Also update instantly when customer submits details in same browser
           const bc = new BroadcastChannel('umbrellanet_livechat');
           bc.onmessage = (ev) => {
             if (ev.data?.type === 'MISSED_REQUEST') refreshMissedBadge();
           };
         
-          
-          setInterval(refreshMissedBadge, 15000); // re-check every 15 seconds
+          // Re-run when tab becomes visible again (e.g. user switches back to this tab)
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') refreshMissedBadge();
+          });
+        
         })();
-
         /* ── LOGIN / LOGOUT ── */
 
         function goOnline() {
