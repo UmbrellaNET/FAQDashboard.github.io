@@ -383,6 +383,48 @@
       }
     }
 
+    // ── Missed requests badge ────────────────────────────────────
+    (async function () {
+      const UPSTASH_URL   = 'https://quiet-snapper-78920.upstash.io';
+      const UPSTASH_TOKEN = 'gQAAAAAAATRIAAIncDFmMTQwZmQyMTcyNDY0MWNkYmZkOGY0MDM3MjljODM3N3AxNzg5MjA';
+    
+      async function upstash(path) {
+        const r = await fetch(UPSTASH_URL + path, {
+          headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+        });
+        return r.json();
+      }
+    
+      async function refreshMissedBadge() {
+        try {
+          // Total missed requests
+          const lenRes  = await upstash('/llen/umbrellanet_missed_requests');
+          const total   = lenRes.result || 0;
+    
+          // Seen IDs
+          const seenRes = await upstash('/smembers/umbrellanet_missed_seen');
+          const seen    = (seenRes.result || []).length;
+    
+          const unseen  = Math.max(0, total - seen);
+          const badge   = document.getElementById('missedBadge');
+          if (!badge) return;
+          badge.textContent = unseen;
+          badge.style.display = unseen > 0 ? 'inline-flex' : 'none';
+        } catch (e) {
+          console.warn('Badge fetch failed', e);
+        }
+      }
+    
+      // Listen for real-time pushes from the chat widget
+      const bc = new BroadcastChannel('umbrellanet_livechat');
+      bc.onmessage = (ev) => {
+        if (ev.data?.type === 'MISSED_REQUEST') refreshMissedBadge();
+      };
+    
+      refreshMissedBadge();
+      setInterval(refreshMissedBadge, 60000); // re-check every minute
+    })();
+
     // ── Stats calculation ─────────────────────────────────────────────────────
     function calculateStats(sessions, startDate, endDate) {
       let totalMessages     = 0;
