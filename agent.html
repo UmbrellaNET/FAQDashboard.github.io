@@ -105,27 +105,10 @@
             padding: 10px;
             border-radius: 8px;
             font-size: 14px;
-            display: flex;
-            align-items: center;
         }
 
         .nav-links a:hover { background: var(--nav-muted); }
         .nav-links a.active { background: var(--nav-primary); color: white; }
-
-        .missed-badge {
-            background: #ef4444;
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            min-width: 20px;
-            height: 20px;
-            border-radius: 10px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            margin-left: auto;
-            padding: 0 5px;
-        }
 
         /* ── MAIN WRAPPER ── */
         .app-wrapper {
@@ -570,7 +553,20 @@
             <a href="agent.html" class="active">Agent</a>
             <a href="missed.html">
                 Missed Agent Requests
-                <span id="missedBadge" class="missed-badge">0</span>
+                <span id="missedBadge" style="
+                    background:#ef4444;
+                    color:white;
+                    font-size:11px;
+                    font-weight:700;
+                    min-width:20px;
+                    height:20px;
+                    border-radius:10px;
+                    display:none;
+                    align-items:center;
+                    justify-content:center;
+                    margin-left:auto;
+                    padding:0 5px;
+                  ">0</span>
             </a>
             <a href="index2.html">Dashboard</a>
         </nav>
@@ -656,9 +652,6 @@
         const CHANNEL = 'umbrellanet_livechat';
         const bc = new BroadcastChannel(CHANNEL);
 
-        const UPSTASH_URL   = 'https://quiet-snapper-78920.upstash.io';
-        const UPSTASH_TOKEN = 'gQAAAAAAATRIAAIncDFmMTQwZmQyMTcyNDY0MWNkYmZkOGY0MDM3MjljODM3N3AxNzg5MjA';
-
         let agentName = '';
         let heartbeatTimer = null;
         let activeChatId = null;
@@ -684,67 +677,6 @@
         const notifAllowBtn   = document.getElementById('notifAllowBtn');
         const notifDismissBtn = document.getElementById('notifDismissBtn');
 
-        /* ── UPSTASH HELPER ── */
-        async function upstash(path) {
-            const r = await fetch(UPSTASH_URL + path, {
-                headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
-            });
-            return r.json();
-        }
-
-        /* ── MISSED BADGE ── */
-        async function refreshMissedBadge() {
-            try {
-                const listRes = await upstash('/lrange/umbrellanet_missed_requests/0/-1');
-                const records = (listRes.result || []).map(s => {
-                    try { return JSON.parse(s); } catch { return null; }
-                }).filter(Boolean);
-
-                const seenRes = await upstash('/smembers/umbrellanet_missed_seen');
-                const seenIds = new Set(seenRes.result || []);
-
-                const unseen = records.filter(r => {
-                    const id = r.id || `${r.userId || ''}_${r.time || r.timestamp || ''}`;
-                    return !seenIds.has(id);
-                }).length;
-
-                const badge = document.getElementById('missedBadge');
-                if (!badge) return;
-                badge.textContent = unseen;
-                badge.style.display = unseen > 0 ? 'inline-flex' : 'none';
-            } catch (e) {
-                console.warn('Badge fetch failed', e);
-            }
-        }
-
-        // Run on load, every 15s, and on tab focus
-        refreshMissedBadge();
-        setInterval(refreshMissedBadge, 15000);
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') refreshMissedBadge();
-        });
-
-        /* ── SAVE MISSED REQUEST TO REDIS ── */
-        function saveMissedRequest(chat, reason) {
-            const record = JSON.stringify({
-                id:          `${chat.userId}_${Date.now()}`,
-                userId:      chat.userId,
-                userName:    chat.userName,
-                lastMessage: chat.lastMessage || 'User requested a live agent',
-                reason,
-                time:        new Date().toISOString(),
-                hasChat:     false,
-                sessionKey:  null
-            });
-            fetch(`${UPSTASH_URL}/rpush/umbrellanet_missed_requests/${encodeURIComponent(record)}`, {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
-            }).then(() => {
-                bc.postMessage({ type: 'MISSED_REQUEST' });
-                refreshMissedBadge();
-            }).catch(e => console.warn('Failed to save missed request:', e));
-        }
-
         /* ── DESKTOP NOTIFICATION HELPERS ── */
 
         function sendAgentAlertNotification(title, body) {
@@ -753,10 +685,14 @@
                 body,
                 icon: 'img/logo.svg',
                 badge: 'img/logo.svg',
-                tag: 'agent-request',
-                renotify: true
+                tag: 'agent-request',          // replaces previous notif of same type
+                renotify: true                  // still chimes even if tag already exists
             });
-            notif.onclick = () => { window.focus(); notif.close(); };
+            // Clicking the notification focuses the agent tab
+            notif.onclick = () => {
+                window.focus();
+                notif.close();
+            };
         }
 
         function requestNotificationPermission() {
@@ -767,10 +703,11 @@
         }
 
         function showNotifPermissionBanner() {
-            if (Notification.permission === 'denied') return;
+            if (Notification.permission === 'denied') return;   // browser blocked it; can't ask
             notifBanner.style.display = 'flex';
         }
 
+        // Banner "Allow" button
         notifAllowBtn.addEventListener('click', async () => {
             notifBanner.style.display = 'none';
             const granted = await requestNotificationPermission();
@@ -782,10 +719,14 @@
             }
         });
 
+        // Banner dismiss
         notifDismissBtn.addEventListener('click', () => {
             notifBanner.style.display = 'none';
         });
 
+        /* ── MAIN NOTIFICATION TRIGGER ──
+           Called every time a new TRANSFER_REQUEST arrives.
+           Mirrors the logic from the client side, adapted for the agent. */
         async function notifyAgentOfRequest(userName, lastMessage) {
             if (Notification.permission === 'granted') {
                 sendAgentAlertNotification(
@@ -793,18 +734,66 @@
                     `${userName}: ${lastMessage || 'A new client is asking to speak with a live agent.'}`
                 );
             } else if (Notification.permission !== 'denied') {
+                // Show the in-app banner first, then ask for permission
                 showNotifPermissionBanner();
                 const granted = await requestNotificationPermission();
                 if (granted) {
                     notifBanner.style.display = 'none';
                     sendAgentAlertNotification(
                         '💬 Live Agent Requested',
-                        `${userName}: ${lastMessage || 'A new client is asking to speak with a live agent.'}`
+                        `${userName}: ${lastMessage || 'A new client is asking to speak with a live agent. Click to open the agent dashboard.'}`
                     );
                 }
             }
+            // If 'denied', fall through silently — toast still shows in-app.
         }
 
+        // ── Missed requests badge (all pages) ────────────────────────────────────
+        (async function () {
+          const UPSTASH_URL   = 'https://quiet-snapper-78920.upstash.io';
+          const UPSTASH_TOKEN = 'gQAAAAAAATRIAAIncDFmMTQwZmQyMTcyNDY0MWNkYmZkOGY0MDM3MjljODM3N3AxNzg5MjA';
+        
+          async function upstash(path) {
+            const r = await fetch(UPSTASH_URL + path, {
+              headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+            });
+            return r.json();
+          }
+        
+          async function refreshMissedBadge() {
+            try {
+              const lenRes  = await upstash('/llen/umbrellanet_missed_requests');
+              const total   = lenRes.result || 0;
+              const seenRes = await upstash('/smembers/umbrellanet_missed_seen');
+              const seen    = (seenRes.result || []).length;
+              const unseen  = Math.max(0, total - seen);
+              const badge   = document.getElementById('missedBadge');
+              if (!badge) return;
+              badge.textContent = unseen;
+              badge.style.display = unseen > 0 ? 'inline-flex' : 'none';
+            } catch (e) {
+              console.warn('Badge fetch failed', e);
+            }
+          }
+        
+          // Run immediately on every page load/reload
+          refreshMissedBadge();
+        
+          // Re-check every 15 seconds
+          setInterval(refreshMissedBadge, 15000);
+        
+          // Also update instantly when customer submits details in same browser
+          const bc = new BroadcastChannel('umbrellanet_livechat');
+          bc.onmessage = (ev) => {
+            if (ev.data?.type === 'MISSED_REQUEST') refreshMissedBadge();
+          };
+        
+          // Re-run when tab becomes visible again (e.g. user switches back to this tab)
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') refreshMissedBadge();
+          });
+        
+        })();
         /* ── LOGIN / LOGOUT ── */
 
         function goOnline() {
@@ -816,6 +805,8 @@
             topbarName.textContent = agentName;
             broadcastOnline();
             heartbeatTimer = setInterval(broadcastOnline, 8000);
+
+            // Prompt for notification permission as soon as agent goes online
             if ('Notification' in window && Notification.permission === 'default') {
                 showNotifPermissionBanner();
             }
@@ -848,12 +839,6 @@
         bc.onmessage = async (e) => {
             const msg = e.data;
 
-            // Update missed badge instantly when a new missed request arrives
-            if (msg.type === 'MISSED_REQUEST') {
-                refreshMissedBadge();
-                return;
-            }
-
             if (msg.type === 'TRANSFER_REQUEST') {
                 if (!chats[msg.userId]) {
                     chats[msg.userId] = {
@@ -866,7 +851,12 @@
                     };
                     renderSidebar();
                     showToast(msg.userName || 'Customer', msg.lastMessage || 'Requesting an agent');
-                    await notifyAgentOfRequest(msg.userName || 'Customer', msg.lastMessage || '');
+
+                    // ── Fire desktop notification for the agent ──
+                    await notifyAgentOfRequest(
+                        msg.userName || 'Customer',
+                        msg.lastMessage || ''
+                    );
                 }
             }
 
@@ -941,10 +931,6 @@
             const chat = chats[userId];
             if (!chat) return;
             bc.postMessage({ type: 'AGENT_DENY', userId, agentName });
-
-            // Save to Redis as a missed request
-            saveMissedRequest(chat, 'denied');
-
             delete chats[userId];
             if (activeChatId === userId) { activeChatId = null; showPlaceholder(); }
             renderSidebar();
