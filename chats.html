@@ -207,7 +207,7 @@
       $chatList.innerHTML = '';
 
       const valid = results
-        .filter(r => r.status === 'fulfilled' && r.value.turns.length > 0)
+        .filter(r => r.status === 'fulfilled' && r.value.turns.length > BOOTSTRAP)
         .map(r => r.value);
 
       if (!valid.length) { $chatList.innerHTML = '<div class="status-message">No sessions with messages</div>'; return; }
