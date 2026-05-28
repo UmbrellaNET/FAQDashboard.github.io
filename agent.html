@@ -762,19 +762,30 @@
         
           async function refreshMissedBadge() {
             try {
-              const lenRes  = await upstash('/llen/umbrellanet_missed_requests');
-              const total   = lenRes.result || 0;
-              const seenRes = await upstash('/smembers/umbrellanet_missed_seen');
-              const seen    = (seenRes.result || []).length;
-              const unseen  = Math.max(0, total - seen);
-              const badge   = document.getElementById('missedBadge');
-              if (!badge) return;
-              badge.textContent = unseen;
-              badge.style.display = unseen > 0 ? 'inline-flex' : 'none';
+                // Fetch all records from the list
+                const listRes = await upstash('/lrange/umbrellanet_missed_requests/0/-1');
+                const records = (listRes.result || []).map(s => {
+                    try { return JSON.parse(s); } catch { return null; }
+                }).filter(Boolean);
+        
+                // Fetch seen IDs
+                const seenRes = await upstash('/smembers/umbrellanet_missed_seen');
+                const seenIds = new Set(seenRes.result || []);
+        
+                // Count records whose ID is not in the seen set
+                const unseen = records.filter(r => {
+                    const id = r.id || `${r.userId || ''}_${r.time || r.timestamp || ''}`;
+                    return !seenIds.has(id);
+                }).length;
+        
+                const badge = document.getElementById('missedBadge');
+                if (!badge) return;
+                badge.textContent = unseen;
+                badge.style.display = unseen > 0 ? 'inline-flex' : 'none';
             } catch (e) {
-              console.warn('Badge fetch failed', e);
+                console.warn('Badge fetch failed', e);
             }
-          }
+        }
         
           // Run immediately on every page load/reload
           refreshMissedBadge();
