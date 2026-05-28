@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UmbrellaNet – Missed Requests</title>
+
+  <link rel="icon" type="image/svg+xml" href="img/logo.svg">
+
+  <style>
+    :root {
+      --bg: #1c1a2e;
+      --primary: #5E185B;
+      --accent: #CE3EC0;
+      --accent-soft: #EBB2E6;
+      --secondary: #32c245;
+      --muted: #2b2b44;
+      --text: #f1e6f9;
+      --card: #2a2740;
+      --border: #333;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 240px;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      flex-shrink: 0;
+    }
+
+    .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
+    .logo { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .logo-img { width: 60px; height: 60px; object-fit: contain; }
+    .brand h1 { font-size: 18px; color: #fff; }
+    .brand-sub { font-size: 12px; color: white; }
+
+    .nav { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .nav a {
+      color: var(--text);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      transition: background 0.15s;
+    }
+    .nav a:hover { background: var(--muted); }
+    .nav a.active { background: var(--primary); color: white; }
+
+    /* Red notification bubble on nav item */
+    .nav-badge {
+      background: var(--danger);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      padding: 0 5px;
+      animation: pulse-badge 2s infinite;
+    }
+    .nav-badge.hidden { display: none; }
+
+    @keyframes pulse-badge {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+      50%       { box-shadow: 0 0 0 5px rgba(239,68,68,0); }
+    }
+
+    /* ── Main area ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 60px;
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .topbar-title { font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .muted { color: #888; font-size: 13px; }
+
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar select,
+    .filter-bar input {
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: 1px solid #353042;
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .btn {
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn.secondary { background: transparent; border: 1px solid var(--primary); }
+    .btn.danger { background: var(--danger); }
+
+    /* ── Split pane ── */
+    .split {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      overflow: hidden;
+    }
+
+    /* ── Request list ── */
+    .req-list {
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .req-list-header {
+      padding: 14px 16px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .req-list-header h2 { font-size: 15px; display: flex; align-items: center; gap: 8px; }
+
+    .req-count {
+      background: var(--danger);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+    }
+
+    .req-scroll { flex: 1; overflow-y: auto; }
+
+    .req-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #2e2b45;
+      cursor: pointer;
+      transition: background 0.12s;
+      position: relative;
+    }
+
+    .req-item:hover { background: var(--muted); }
+    .req-item.active { background: var(--primary); }
+    .req-item.seen::after { display: none; }
+
+    /* Unread dot */
+    .req-item:not(.seen)::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      right: 14px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--danger);
+    }
+
+    .req-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 5px;
+      flex-wrap: wrap;
+    }
+
+    .req-user { font-weight: 600; font-size: 14px; }
+
+    .req-tag {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .tag-missed    { background: rgba(239,68,68,0.2);  color: #f87171; }
+    .tag-denied    { background: rgba(245,158,11,0.2); color: #fbbf24; }
+    .tag-timeout   { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+    .tag-has-chat  { background: rgba(50,194,69,0.15); color: #4ade80; }
+
+    .req-preview { font-size: 13px; color: #bbb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .req-item.active .req-preview { color: #ddd; }
+    .req-time { font-size: 11px; color: #777; }
+    .req-item.active .req-time { color: #ccc; }
+
+    /* ── Detail pane ── */
+    .detail {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: linear-gradient(180deg, #211f38, #1c1a2e);
+    }
+
+    .detail-header {
+      padding: 16px 24px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .detail-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .detail-info { flex: 1; }
+    .detail-info h3 { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+    .detail-info .meta-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .detail-info .meta-item { font-size: 12px; color: #999; display: flex; align-items: center; gap: 4px; }
+
+    .detail-actions { display: flex; gap: 8px; }
+    .icon-btn {
+      background: var(--muted);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      transition: background 0.15s;
+    }
+    .icon-btn:hover { background: var(--primary); }
+
+    .detail-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+
+    /* Request message card */
+    .request-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .request-card-title {
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .request-card-title span { color: var(--danger); }
+
+    .trigger-message {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #f1e6f9;
+      margin-bottom: 10px;
+    }
+
+    .req-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .info-pill {
+      background: var(--muted);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    .info-pill label { display: block; font-size: 10px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .info-pill span { color: var(--accent-soft); font-weight: 500; }
+
+    /* Chat history section */
+    .chat-section-title {
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .chat-section-title span { color: var(--secondary); }
+
+    .chat-bubble-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-bubble {
+      max-width: 72%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      word-wrap: break-word;
+    }
+
+    .bubble-user {
+      align-self: flex-start;
+      background: var(--muted);
+      color: var(--text);
+    }
+
+    .bubble-bot {
+      align-self: flex-end;
+      background: #3d2b5a;
+      color: var(--accent-soft);
+    }
+
+    .bubble-role {
+      font-size: 10px;
+      opacity: 0.6;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .bubble-time {
+      font-size: 10px;
+      opacity: 0.5;
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    .date-divider {
+      text-align: center;
+      color: #666;
+      font-size: 11px;
+      position: relative;
+      margin: 4px 0;
+    }
+    .date-divider::before, .date-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 35%;
+      height: 1px;
+      background: #333;
+    }
+    .date-divider::before { left: 0; }
+    .date-divider::after  { right: 0; }
+
+    .no-chat-notice {
+      background: var(--muted);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #777;
+      text-align: center;
+    }
+
+    /* Empty / loading states */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 12px;
+      color: #555;
+    }
+
+    .empty-icon { font-size: 48px; opacity: 0.4; }
+    .empty-text { font-size: 14px; }
+
+    .loading-dots { display: flex; gap: 5px; align-items: center; justify-content: center; padding: 30px; }
+    .loading-dots span { width: 7px; height: 7px; border-radius: 50%; background: #888; animation: db 1.4s infinite ease-in-out; }
+    .loading-dots span:nth-child(2) { animation-delay: .2s; }
+    .loading-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes db { 0%,80%,100%{transform:scale(.8);opacity:.4;} 40%{transform:scale(1.2);opacity:1;} }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-error   { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+    .badge-success { background: rgba(50,194,69,0.15); color: #4ade80; border: 1px solid rgba(50,194,69,0.3); }
+    .badge-info    { background: rgba(206,62,192,0.15); color: var(--accent-soft); border: 1px solid rgba(206,62,192,0.3); }
+
+    .refresh-btn { background: none; border: 1px solid #444; color: var(--text); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .refresh-btn:hover { background: var(--muted); }
+
+    .mark-all-btn { background: transparent; border: 1px solid var(--danger); color: #f87171; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.15s; }
+    .mark-all-btn:hover { background: rgba(239,68,68,0.15); }
+
+    @media (max-width: 1000px) {
+      .sidebar { display: none; }
+      .split { grid-template-columns: 300px 1fr; }
+    }
+    @media (max-width: 700px) {
+      .split { grid-template-columns: 1fr; }
+      .detail { display: none; }
+      .detail.show-mobile { display: flex; position: fixed; inset: 0; z-index: 100; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="logo"><img src="img/logo.svg" alt="" class="logo-img"></div>
+    <div>
+      <h1>UmbrellaNet</h1>
+      <div class="brand-sub">Admin Dashboard</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="chats.html">💬 Chats</a>
+    <a href="analytics.html">📊 Analytics</a>
+    <a href="agent.html">🎧 Agent</a>
+    <a href="index2.html">🏠 Dashboard</a>
+    <a href="missed.html" class="active">
+      🚨 Missed Requests
+      <span class="nav-badge" id="navBadge">0</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- ── Main ── -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title">
+      🚨 Missed Agent Requests
+    </div>
+    <div class="topbar-right">
+      <span class="muted" id="lastUpdated">Last updated: —</span>
+      <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+      <button class="mark-all-btn" id="markAllBtn">✓ Mark all read</button>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <select id="filterType">
+      <option value="all">All reasons</option>
+      <option value="timeout">Timeout (no agent)</option>
+      <option value="denied">Agent denied</option>
+      <option value="disconnect">User disconnected</option>
+    </select>
+    <select id="filterChat">
+      <option value="all">All sessions</option>
+      <option value="has-chat">Has chat history</option>
+      <option value="no-chat">No chat history</option>
+    </select>
+    <input type="date" id="filterDate" title="Filter by date">
+    <button class="btn" id="applyFilter">Apply</button>
+    <button class="btn secondary" id="clearFilter">Clear</button>
+  </div>
+
+  <!-- Split pane -->
+  <div class="split">
+
+    <!-- Left: request list -->
+    <div class="req-list">
+      <div class="req-list-header">
+        <h2>Requests <span class="req-count" id="reqCount">0</span></h2>
+        <button class="refresh-btn" id="listRefreshBtn" style="font-size:11px">↻</button>
+      </div>
+      <div class="req-scroll" id="reqScroll">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <!-- Right: detail pane -->
+    <div class="detail" id="detailPane">
+      <div class="empty-state" id="emptyDetail">
+        <div class="empty-icon">🚨</div>
+        <div class="empty-text">Select a request to view details</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const CONFIG = {
+  upstash: {
+    endpoint: "https://quiet-snapper-78920.upstash.io",
+    token:    "gQAAAAAAATRIAAIncDFmMTQwZmQyMTcyNDY0MWNkYmZkOGY0MDM3MjljODM3N3AxNzg5MjA"
+  }
+};
+
+const BOOTSTRAP    = 2;
+const MISSED_KEY   = 'umbrellanet_missed_requests'; // Redis list of JSON objects
+const SEEN_KEY     = 'umbrellanet_missed_seen';     // Redis set of seen request IDs
+
+// Local state
+let allRequests  = [];   // full list loaded from Redis
+let filteredReqs = [];   // after filter
+let chatCache    = {};   // sessionKey → turns[]
+let seenIds      = new Set();
+let activeId     = null;
+
+// ── DOM refs ──────────────────────────────────────────────────────────────────
+const $reqScroll   = document.getElementById('reqScroll');
+const $reqCount    = document.getElementById('reqCount');
+const $navBadge    = document.getElementById('navBadge');
+const $detailPane  = document.getElementById('detailPane');
+const $lastUpdated = document.getElementById('lastUpdated');
+const $filterType  = document.getElementById('filterType');
+const $filterChat  = document.getElementById('filterChat');
+const $filterDate  = document.getElementById('filterDate');
+
+// ── Upstash helpers ───────────────────────────────────────────────────────────
+async function upstash(path, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: {
+      Authorization: `Bearer ${CONFIG.upstash.token}`,
+      'Content-Type': 'application/json'
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(CONFIG.upstash.endpoint + path, opts);
+  if (!res.ok) throw new Error(`Upstash ${res.status}`);
+  return res.json();
+}
+
+async function scanKeys(pattern) {
+  let all = [], cursor = '0';
+  do {
+    const j = await upstash(`/scan/${cursor}?match=${encodeURIComponent(pattern)}&count=100`);
+    cursor = j.result[0];
+    all.push(...(j.result[1] || []));
+  } while (cursor !== '0');
+  return [...new Set(all)];
+}
+
+async function fetchList(key) {
+  try {
+    const j = await upstash(`/lrange/${encodeURIComponent(key)}/0/-1`);
+    return (j.result || []).map(s => { try { return JSON.parse(s); } catch { return null; } }).filter(Boolean);
+  } catch { return []; }
+}
+
+async function smembers(key) {
+  try {
+    const j = await upstash(`/smembers/${encodeURIComponent(key)}`);
+    return new Set(j.result || []);
+  } catch { return new Set(); }
+}
+
+async function sadd(key, member) {
+  try { await upstash(`/sadd/${encodeURIComponent(key)}/${encodeURIComponent(member)}`); } catch {}
+}
+
+// ── Key helpers ───────────────────────────────────────────────────────────────
+function parseSessionKey(key) {
+  const s = key.replace(/^umbrellanet_chat_/, '');
+  const m = s.match(/^([0-9a-f]{16})_(.+)$/i);
+  return m ? { ipHash: m[1], sessionId: m[2] } : { ipHash: 'unknown', sessionId: s };
+}
+
+// ── Generate a synthetic request ID from the request object ──────────────────
+function reqId(req) {
+  return req.id || `${req.userId || ''}_${req.time || req.timestamp || ''}`;
+}
+
+// ── Load missed requests from Redis ──────────────────────────────────────────
+/**
+ * Missed requests are stored in the Redis list MISSED_KEY.
+ * Each item is a JSON object with (at minimum):
+ *   { userId, userName, lastMessage, time, reason? }
+ *
+ * We also fall back to scanning chat sessions for messages
+ * that contain agent-request keywords but have no follow-up
+ * agent message — treating those as implicit missed requests.
+ */
+async function loadMissedRequests() {
+  $reqScroll.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
+
+  try {
+    // Load seen IDs from Redis
+    seenIds = await smembers(SEEN_KEY);
+
+    // 1. Explicit missed-request records
+    const explicit = await fetchList(MISSED_KEY);
+
+    // 2. Scan chat sessions for implicit missed requests
+    //    (user said agent-trigger keywords but never got connected)
+    const chatKeys = await scanKeys('umbrellanet_chat_*');
+    const chatResults = await Promise.allSettled(
+      chatKeys.map(async k => ({ key: k, turns: await fetchList(k) }))
+    );
+
+    const AGENT_RX = /\b(speak|talk|chat)\s+(to|with)\s+(a\s+)?(human|agent|person|representative|support)\b|\bhuman\b|\bsupport\b|\bagent\b|\blive\s+person\b|\bescalate\b/i;
+
+    const implicit = [];
+    chatResults.forEach(r => {
+      if (r.status !== 'fulfilled') return;
+      const { key, turns } = r.value;
+      const real = turns.slice(BOOTSTRAP);
+      if (!real.length) return;
+      const { ipHash, sessionId } = parseSessionKey(key);
+
+      real.forEach((turn, idx) => {
+        if (turn?.role !== 'user' || !turn.text) return;
+        if (!AGENT_RX.test(turn.text)) return;
+
+        // Check if next turn is an agent/human message (role='agent')
+        const next = real[idx + 1];
+        const wasHandled = next && (next.role === 'agent' || next.role === 'human');
+        if (wasHandled) return;
+
+        // Already recorded as explicit?
+        const alreadyExplicit = explicit.some(e =>
+          (e.sessionKey === key) || (e.userId && key.includes(e.userId))
+        );
+
+        implicit.push({
+          id:          `implicit_${key}_${idx}`,
+          userId:      ipHash,
+          userName:    `Session ${sessionId.slice(0, 10)}`,
+          sessionKey:  key,
+          lastMessage: turn.text,
+          reason:      'timeout',
+          time:        turn.timestamp || null,
+          hasChat:     true
+        });
+
+        chatCache[key] = turns; // cache for later
+      });
+    });
+
+    // Merge: explicit takes priority, deduplicate by sessionKey
+    const seen = new Set();
+    const merged = [];
+    [...explicit, ...implicit].forEach(req => {
+      const dedupeKey = req.sessionKey || req.userId || reqId(req);
+      if (!seen.has(dedupeKey)) {
+        seen.add(dedupeKey);
+        // Enrich with hasChat flag if sessionKey exists
+        if (req.sessionKey && !req.hasChat) {
+          req.hasChat = (chatCache[req.sessionKey] || []).length > BOOTSTRAP;
+        }
+        merged.push(req);
+      }
+    });
+
+    // Sort newest first
+    merged.sort((a, b) => {
+      const ta = a.time ? new Date(a.time) : new Date(0);
+      const tb = b.time ? new Date(b.time) : new Date(0);
+      return tb - ta;
+    });
+
+    allRequests  = merged;
+    filteredReqs = merged;
+    renderList(filteredReqs);
+    updateBadge();
+    $lastUpdated.textContent = new Date().toLocaleTimeString();
+
+  } catch (err) {
+    console.error(err);
+    $reqScroll.innerHTML = `<div style="padding:16px;color:#f87171;">Error loading requests: ${esc(err.message)}</div>`;
+  }
+}
+
+// ── Render list ───────────────────────────────────────────────────────────────
+function renderList(reqs) {
+  $reqScroll.innerHTML = '';
+  $reqCount.textContent = reqs.length;
+
+  if (!reqs.length) {
+    $reqScroll.innerHTML = `<div class="empty-state" style="height:200px;"><div class="empty-icon">✅</div><div class="empty-text">No missed requests</div></div>`;
+    return;
+  }
+
+  reqs.forEach(req => {
+    const id      = reqId(req);
+    const isSeen  = seenIds.has(id);
+    const reason  = req.reason || 'timeout';
+    const tagMap  = { timeout: 'tag-timeout', denied: 'tag-denied', disconnect: 'tag-missed' };
+    const tagCls  = tagMap[reason] || 'tag-missed';
+    const timeStr = req.time ? fmtTime(req.time) : 'Unknown time';
+
+    const item = document.createElement('div');
+    item.className = `req-item${isSeen ? ' seen' : ''}${id === activeId ? ' active' : ''}`;
+    item.dataset.id = id;
+
+    item.innerHTML = `
+      <div class="req-meta">
+        <span class="req-user">${esc(req.userName || req.userId || 'Unknown')}</span>
+        <span class="req-tag ${tagCls}">${reason}</span>
+        ${req.hasChat ? `<span class="req-tag tag-has-chat">chat</span>` : ''}
+      </div>
+      <div class="req-preview">${esc(req.lastMessage || '—')}</div>
+      <div class="req-time">${timeStr}</div>
+    `;
+
+    item.addEventListener('click', () => selectRequest(req, item));
+    $reqScroll.appendChild(item);
+  });
+}
+
+// ── Select & show request detail ──────────────────────────────────────────────
+async function selectRequest(req, itemEl) {
+  // Mark active
+  document.querySelectorAll('.req-item').forEach(el => el.classList.remove('active'));
+  itemEl.classList.add('active');
+  activeId = reqId(req);
+
+  // Mark as seen
+  const id = reqId(req);
+  if (!seenIds.has(id)) {
+    seenIds.add(id);
+    itemEl.classList.add('seen');
+    await sadd(SEEN_KEY, id);
+    updateBadge();
+  }
+
+  renderDetail(req);
+}
+
+// ── Render detail pane ────────────────────────────────────────────────────────
+async function renderDetail(req) {
+  $detailPane.innerHTML = `<div class="loading-dots" style="margin:auto"><span></span><span></span><span></span></div>`;
+
+  // Load chat history if we have a session key
+  let turns = [];
+  if (req.sessionKey) {
+    if (chatCache[req.sessionKey]) {
+      turns = chatCache[req.sessionKey];
+    } else {
+      turns = await fetchList(req.sessionKey);
+      chatCache[req.sessionKey] = turns;
+    }
+  }
+
+  const real   = turns.slice(BOOTSTRAP);
+  const reason = req.reason || 'timeout';
+  const id     = reqId(req);
+  const timeStr = req.time ? new Date(req.time).toLocaleString() : 'Unknown';
+
+  const reasonLabels = {
+    timeout:    '⏱️ No agent responded within 60 seconds',
+    denied:     '❌ Agent actively denied the request',
+    disconnect: '🔌 User disconnected before agent joined'
+  };
+
+  $detailPane.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-avatar">👤</div>
+      <div class="detail-info">
+        <h3>${esc(req.userName || req.userId || 'Unknown User')}</h3>
+        <div class="meta-row">
+          <span class="meta-item">🕐 ${timeStr}</span>
+          ${req.userId ? `<span class="meta-item">🆔 ${esc(req.userId.slice(0,16))}…</span>` : ''}
+          <span class="status-badge badge-error">🚨 ${esc(reason)}</span>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button class="icon-btn" title="Copy user ID" onclick="navigator.clipboard.writeText('${esc(req.userId || '')}')">📋</button>
+      </div>
+    </div>
+
+    <div class="detail-body">
+      <!-- Trigger message card -->
+      <div class="request-card">
+        <div class="request-card-title">🚨 <span>Missed Agent Request</span></div>
+        <div class="trigger-message">${esc(req.lastMessage || 'No message recorded')}</div>
+        <div class="req-info-grid">
+          <div class="info-pill">
+            <label>Reason</label>
+            <span>${reasonLabels[reason] || reason}</span>
+          </div>
+          <div class="info-pill">
+            <label>Time</label>
+            <span>${timeStr}</span>
+          </div>
+          <div class="info-pill">
+            <label>Session</label>
+            <span>${req.sessionKey ? esc(parseSessionKey(req.sessionKey).sessionId.slice(0,20)) : '—'}</span>
+          </div>
+          <div class="info-pill">
+            <label>Chat history</label>
+            <span>${real.length ? `${real.length} messages` : 'None'}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat history -->
+      <div>
+        <div class="chat-section-title">💬 <span>Chat History</span> ${real.length ? `(${real.length} messages)` : ''}</div>
+        ${real.length
+          ? renderChatBubbles(real)
+          : `<div class="no-chat-notice">No chat history available for this session.</div>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+function renderChatBubbles(turns) {
+  let html = '<div class="chat-bubble-wrap">';
+  let lastDate = null;
+
+  turns.forEach(turn => {
+    if (!turn?.text) return;
+    const isUser  = turn.role === 'user';
+    const cls     = isUser ? 'bubble-user' : 'bubble-bot';
+    const label   = isUser ? '👤 User' : '🤖 Assistant';
+    const dateStr = turn.timestamp ? new Date(turn.timestamp).toDateString() : new Date().toDateString();
+    const timeStr = turn.timestamp
+      ? new Date(turn.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : '';
+
+    if (lastDate !== dateStr) {
+      html += `<div class="date-divider">${dateLabel(dateStr)}</div>`;
+      lastDate = dateStr;
+    }
+
+    html += `
+      <div class="chat-bubble ${cls}">
+        <div class="bubble-role">${label}</div>
+        ${esc(turn.text)}
+        ${timeStr ? `<div class="bubble-time">${timeStr}</div>` : ''}
+      </div>
+    `;
+  });
+
+  html += '</div>';
+  return html;
+}
+
+// ── Badge counter ─────────────────────────────────────────────────────────────
+function updateBadge() {
+  const unseen = allRequests.filter(r => !seenIds.has(reqId(r))).length;
+  $navBadge.textContent = unseen;
+  $navBadge.classList.toggle('hidden', unseen === 0);
+}
+
+// ── Mark all read ─────────────────────────────────────────────────────────────
+document.getElementById('markAllBtn').addEventListener('click', async () => {
+  for (const req of allRequests) {
+    const id = reqId(req);
+    if (!seenIds.has(id)) {
+      seenIds.add(id);
+      await sadd(SEEN_KEY, id);
+    }
+  }
+  document.querySelectorAll('.req-item').forEach(el => el.classList.add('seen'));
+  updateBadge();
+});
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function applyFilters() {
+  const type    = $filterType.value;
+  const chat    = $filterChat.value;
+  const dateVal = document.getElementById('filterDate').value;
+
+  filteredReqs = allRequests.filter(req => {
+    if (type !== 'all' && (req.reason || 'timeout') !== type) return false;
+    if (chat === 'has-chat' && !req.hasChat) return false;
+    if (chat === 'no-chat'  &&  req.hasChat) return false;
+    if (dateVal && req.time) {
+      const d = new Date(req.time).toISOString().slice(0,10);
+      if (d !== dateVal) return false;
+    }
+    return true;
+  });
+
+  renderList(filteredReqs);
+  if (activeId) {
+    const el = $reqScroll.querySelector(`[data-id="${CSS.escape(activeId)}"]`);
+    if (el) el.classList.add('active');
+  }
+}
+
+document.getElementById('applyFilter').addEventListener('click', applyFilters);
+document.getElementById('clearFilter').addEventListener('click', () => {
+  $filterType.value = 'all';
+  $filterChat.value = 'all';
+  document.getElementById('filterDate').value = '';
+  filteredReqs = allRequests;
+  renderList(filteredReqs);
+});
+
+// ── Refresh ───────────────────────────────────────────────────────────────────
+document.getElementById('refreshBtn').addEventListener('click', loadMissedRequests);
+document.getElementById('listRefreshBtn').addEventListener('click', loadMissedRequests);
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtTime(ts) {
+  const d = new Date(ts);
+  if (isNaN(d)) return String(ts);
+  const today = new Date().toDateString();
+  const yest  = new Date(Date.now() - 86400000).toDateString();
+  if (d.toDateString() === today) return `Today ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+  if (d.toDateString() === yest)  return `Yesterday ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+  return d.toLocaleDateString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+function dateLabel(ds) {
+  const today = new Date().toDateString();
+  const yest  = new Date(Date.now()-86400000).toDateString();
+  if (ds === today) return 'Today';
+  if (ds === yest)  return 'Yesterday';
+  return new Date(ds).toLocaleDateString([],{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadMissedRequests();
+// Auto-refresh every 5 minutes
+setInterval(loadMissedRequests, 300000);
+</script>
+</body>
+</html>
