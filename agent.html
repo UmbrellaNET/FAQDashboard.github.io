@@ -27,7 +27,6 @@
             --muted: #94a3b8;
             --msg-agent: rgba(104, 61, 102, 0.85);
             --msg-user: rgba(129, 140, 248, 0.2);
-            /* analytics sidebar vars */
             --nav-bg: #2a2740;
             --nav-primary: #5E185B;
             --nav-text: #f1e6f9;
@@ -43,7 +42,7 @@
             flex-direction: column;
         }
 
-        /* ── ANALYTICS-STYLE NAV SIDEBAR ── */
+        /* ── NAV SIDEBAR ── */
         .nav-sidebar {
             width: 240px;
             background: var(--nav-bg);
@@ -108,22 +107,67 @@
             font-size: 14px;
         }
 
-        .nav-links a:hover {
-            background: var(--nav-muted);
-        }
+        .nav-links a:hover { background: var(--nav-muted); }
+        .nav-links a.active { background: var(--nav-primary); color: white; }
 
-        .nav-links a.active {
-            background: var(--nav-primary);
-            color: white;
-        }
-
-        /* ── MAIN WRAPPER (offset by nav sidebar) ── */
+        /* ── MAIN WRAPPER ── */
         .app-wrapper {
             margin-left: 240px;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
+
+        /* ── NOTIFICATION PERMISSION BANNER ── */
+        #notifBanner {
+            display: none;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(90deg, rgba(94,24,91,0.6), rgba(235,178,230,0.12));
+            border-bottom: 1px solid rgba(235,178,230,0.3);
+            padding: 11px 22px;
+            font-size: 13px;
+            color: var(--text);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        #notifBanner i {
+            font-size: 18px;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        #notifBanner span { flex: 1; }
+
+        #notifBanner .btn-allow {
+            background: linear-gradient(to right, var(--accent2), var(--accent));
+            border: none;
+            border-radius: 8px;
+            padding: 7px 16px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+        }
+
+        #notifBanner .btn-allow:hover { opacity: 0.85; }
+
+        #notifBanner .btn-dismiss {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 6px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        #notifBanner .btn-dismiss:hover { color: var(--text); }
 
         /* ── LOGIN SCREEN ── */
         #loginScreen {
@@ -156,17 +200,8 @@
             text-align: center;
         }
 
-        .login-card p {
-            font-size: 14px;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .login-card label {
-            font-size: 13px;
-            color: var(--muted);
-            margin-bottom: -12px;
-        }
+        .login-card p { font-size: 14px; color: var(--muted); text-align: center; }
+        .login-card label { font-size: 13px; color: var(--muted); margin-bottom: -12px; }
 
         .login-card input {
             padding: 11px 15px;
@@ -196,9 +231,7 @@
             transition: opacity 0.2s;
         }
 
-        .login-card .btn-primary:hover {
-            opacity: 0.88;
-        }
+        .login-card .btn-primary:hover { opacity: 0.88; }
 
         /* ── AGENT PANEL ── */
         #agentPanel {
@@ -207,7 +240,6 @@
             flex-direction: column;
         }
 
-        /* Top bar */
         .topbar {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -221,11 +253,7 @@
             z-index: 10;
         }
 
-        .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
+        .topbar-left { display: flex; align-items: center; gap: 14px; }
 
         .topbar-avatar {
             width: 40px;
@@ -239,23 +267,10 @@
             color: white;
         }
 
-        .topbar h2 {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
+        .topbar h2 { font-size: 1.1rem; font-weight: 700; }
+        .topbar .subtitle { font-size: 12px; color: var(--muted); }
 
-        .topbar .subtitle {
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 13px;
-            font-weight: 600;
-        }
+        .status-badge { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; }
 
         .status-dot-lg {
             width: 10px;
@@ -276,11 +291,8 @@
             transition: background 0.2s;
         }
 
-        .btn-logout:hover {
-            background: rgba(239,68,68,0.1);
-        }
+        .btn-logout:hover { background: rgba(239,68,68,0.1); }
 
-        /* Main layout */
         .panel-body {
             flex: 1;
             display: grid;
@@ -289,7 +301,7 @@
             height: calc(100vh - 69px);
         }
 
-        /* ── Sidebar: incoming + active requests ── */
+        /* ── Sidebar ── */
         .sidebar {
             background: var(--surface);
             border-right: 1px solid var(--border);
@@ -311,7 +323,7 @@
         #requestList {
             flex: 1;
             overflow-y: auto;
-            padding: 10px 10px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -324,12 +336,7 @@
             font-size: 13px;
         }
 
-        .empty-state i {
-            font-size: 28px;
-            margin-bottom: 10px;
-            display: block;
-            opacity: 0.4;
-        }
+        .empty-state i { font-size: 28px; margin-bottom: 10px; display: block; opacity: 0.4; }
 
         .request-card {
             background: var(--surface2);
@@ -340,46 +347,14 @@
             transition: border-color 0.2s, background 0.2s;
         }
 
-        .request-card:hover {
-            border-color: var(--accent);
-            background: rgba(235,178,230,0.04);
-        }
+        .request-card:hover { border-color: var(--accent); background: rgba(235,178,230,0.04); }
+        .request-card.active { border-color: var(--accent); background: rgba(235,178,230,0.07); }
 
-        .request-card.active {
-            border-color: var(--accent);
-            background: rgba(235,178,230,0.07);
-        }
-
-        .rc-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 6px;
-        }
-
-        .rc-name {
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .rc-time {
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        .rc-preview {
-            font-size: 12px;
-            color: var(--muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 10px;
-        }
-
-        .rc-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .rc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .rc-name { font-size: 14px; font-weight: 700; }
+        .rc-time { font-size: 11px; color: var(--muted); }
+        .rc-preview { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 10px; }
+        .rc-actions { display: flex; gap: 8px; }
 
         .btn-accept, .btn-deny {
             flex: 1;
@@ -392,20 +367,9 @@
             transition: opacity 0.2s;
         }
 
-        .btn-accept {
-            background: var(--green);
-            color: white;
-        }
-
-        .btn-deny {
-            background: rgba(239,68,68,0.15);
-            color: var(--red);
-            border: 1px solid rgba(239,68,68,0.3);
-        }
-
-        .btn-accept:hover, .btn-deny:hover {
-            opacity: 0.82;
-        }
+        .btn-accept { background: var(--green); color: white; }
+        .btn-deny { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+        .btn-accept:hover, .btn-deny:hover { opacity: 0.82; }
 
         .rc-live-badge {
             font-size: 11px;
@@ -417,11 +381,7 @@
         }
 
         /* ── Chat area ── */
-        .chat-area {
-            display: flex;
-            flex-direction: column;
-            background: var(--bg);
-        }
+        .chat-area { display: flex; flex-direction: column; background: var(--bg); }
 
         .chat-placeholder {
             flex: 1;
@@ -433,22 +393,10 @@
             gap: 14px;
         }
 
-        .chat-placeholder i {
-            font-size: 48px;
-            opacity: 0.2;
-        }
+        .chat-placeholder i { font-size: 48px; opacity: 0.2; }
+        .chat-placeholder p { font-size: 15px; }
 
-        .chat-placeholder p {
-            font-size: 15px;
-        }
-
-        /* Active chat */
-        #activeChat {
-            display: none;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-        }
+        #activeChat { display: none; flex-direction: column; flex: 1; min-height: 0; }
 
         .chat-top {
             background: var(--surface);
@@ -459,15 +407,8 @@
             justify-content: space-between;
         }
 
-        .chat-top-info h3 {
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        .chat-top-info p {
-            font-size: 12px;
-            color: var(--muted);
-        }
+        .chat-top-info h3 { font-size: 15px; font-weight: 700; }
+        .chat-top-info p { font-size: 12px; color: var(--muted); }
 
         .btn-end {
             background: none;
@@ -481,9 +422,7 @@
             transition: background 0.2s;
         }
 
-        .btn-end:hover {
-            background: rgba(239,68,68,0.1);
-        }
+        .btn-end:hover { background: rgba(239,68,68,0.1); }
 
         .messages-wrap {
             flex: 1;
@@ -502,31 +441,10 @@
             line-height: 1.5;
         }
 
-        .msg-user {
-            background: var(--msg-user);
-            align-self: flex-start;
-            border-bottom-left-radius: 5px;
-        }
-
-        .msg-agent {
-            background: var(--msg-agent);
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
-
-        .msg-ts {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 4px;
-            text-align: right;
-        }
-
-        .msg-label {
-            font-size: 10px;
-            font-weight: 700;
-            margin-bottom: 3px;
-            color: var(--muted);
-        }
+        .msg-user { background: var(--msg-user); align-self: flex-start; border-bottom-left-radius: 5px; }
+        .msg-agent { background: var(--msg-agent); align-self: flex-end; border-bottom-right-radius: 5px; }
+        .msg-ts { font-size: 11px; color: var(--muted); margin-top: 4px; text-align: right; }
+        .msg-label { font-size: 10px; font-weight: 700; margin-bottom: 3px; color: var(--muted); }
 
         .system-notice {
             text-align: center;
@@ -574,11 +492,9 @@
             transition: opacity 0.2s;
         }
 
-        .input-area button:hover {
-            opacity: 0.88;
-        }
+        .input-area button:hover { opacity: 0.88; }
 
-        /* Notification toast */
+        /* Toast */
         .toast {
             position: fixed;
             top: 20px;
@@ -596,20 +512,9 @@
             gap: 12px;
         }
 
-        .toast i {
-            font-size: 20px;
-            color: var(--accent);
-        }
-
-        .toast-body p:first-child {
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .toast-body p:last-child {
-            font-size: 12px;
-            color: var(--muted);
-        }
+        .toast i { font-size: 20px; color: var(--accent); }
+        .toast-body p:first-child { font-size: 14px; font-weight: 700; }
+        .toast-body p:last-child { font-size: 12px; color: var(--muted); }
 
         @keyframes pulse-dot {
             0%, 100% { opacity: 1; }
@@ -621,22 +526,17 @@
             to   { opacity: 1; transform: translateX(0); }
         }
 
-        /* Responsive */
         @media (max-width: 700px) {
             .nav-sidebar { display: none; }
             .app-wrapper { margin-left: 0; }
             .panel-body { grid-template-columns: 1fr; }
-            .sidebar {
-                max-height: 220px;
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-            }
+            .sidebar { max-height: 220px; border-right: none; border-bottom: 1px solid var(--border); }
         }
     </style>
 </head>
 <body>
 
-    <!-- ════════════ NAV SIDEBAR (from analytics.html) ════════════ -->
+    <!-- NAV SIDEBAR -->
     <aside class="nav-sidebar">
         <div class="nav-brand">
             <div class="nav-logo">
@@ -655,10 +555,18 @@
         </nav>
     </aside>
 
-    <!-- ════════════ MAIN APP WRAPPER ════════════ -->
+    <!-- MAIN APP WRAPPER -->
     <div class="app-wrapper">
 
-        <!-- ════════════ LOGIN ════════════ -->
+        <!-- NOTIFICATION PERMISSION BANNER -->
+        <div id="notifBanner">
+            <i class="fas fa-bell"></i>
+            <span>Enable desktop notifications so you never miss an incoming chat request.</span>
+            <button class="btn-allow" id="notifAllowBtn"><i class="fas fa-check"></i> Allow Notifications</button>
+            <button class="btn-dismiss" id="notifDismissBtn" title="Dismiss">&#x2715;</button>
+        </div>
+
+        <!-- LOGIN -->
         <div id="loginScreen">
             <div class="login-card">
                 <h1><i class="fas fa-headset"></i> Agent Panel</h1>
@@ -669,7 +577,7 @@
             </div>
         </div>
 
-        <!-- ════════════ AGENT PANEL ════════════ -->
+        <!-- AGENT PANEL -->
         <div id="agentPanel">
             <div class="topbar">
                 <div class="topbar-left">
@@ -683,11 +591,10 @@
                     <div class="status-dot-lg" id="onlineDot"></div>
                     <span id="onlineLabel">Online</span>
                 </div>
-                <button class="btn-logout" id="logoutBtn"><i class=""></i>Go Offline</button>
+                <button class="btn-logout" id="logoutBtn">Go Offline</button>
             </div>
 
             <div class="panel-body">
-                <!-- Incoming & Active chats sidebar -->
                 <div class="sidebar">
                     <div class="sidebar-title"><i class="fas fa-inbox"></i> &nbsp;Incoming &amp; Active Chats</div>
                     <div id="requestList">
@@ -698,7 +605,6 @@
                     </div>
                 </div>
 
-                <!-- Chat area -->
                 <div class="chat-area" id="chatArea">
                     <div class="chat-placeholder" id="chatPlaceholder">
                         <i class="fas fa-comments"></i>
@@ -723,7 +629,7 @@
             </div>
         </div>
 
-    </div><!-- /.app-wrapper -->
+    </div>
 
     <script>
         const CHANNEL = 'umbrellanet_livechat';
@@ -732,35 +638,115 @@
         let agentName = '';
         let heartbeatTimer = null;
         let activeChatId = null;
-
         const chats = {};
 
-        const loginScreen   = document.getElementById('loginScreen');
-        const agentPanel    = document.getElementById('agentPanel');
-        const agentNameInput = document.getElementById('agentNameInput');
-        const loginBtn      = document.getElementById('loginBtn');
-        const topbarName    = document.getElementById('topbarName');
-        const logoutBtn     = document.getElementById('logoutBtn');
-        const requestList   = document.getElementById('requestList');
-        const emptyState    = document.getElementById('emptyState');
+        const loginScreen     = document.getElementById('loginScreen');
+        const agentPanel      = document.getElementById('agentPanel');
+        const agentNameInput  = document.getElementById('agentNameInput');
+        const loginBtn        = document.getElementById('loginBtn');
+        const topbarName      = document.getElementById('topbarName');
+        const logoutBtn       = document.getElementById('logoutBtn');
+        const requestList     = document.getElementById('requestList');
+        const emptyState      = document.getElementById('emptyState');
         const chatPlaceholder = document.getElementById('chatPlaceholder');
-        const activeChatEl  = document.getElementById('activeChat');
-        const activeChatName = document.getElementById('activeChatName');
-        const activeChatSub = document.getElementById('activeChatSub');
-        const messagesWrap  = document.getElementById('messagesWrap');
-        const agentInput    = document.getElementById('agentInput');
-        const agentSend     = document.getElementById('agentSend');
-        const endChatBtn    = document.getElementById('endChatBtn');
+        const activeChatEl    = document.getElementById('activeChat');
+        const activeChatName  = document.getElementById('activeChatName');
+        const activeChatSub   = document.getElementById('activeChatSub');
+        const messagesWrap    = document.getElementById('messagesWrap');
+        const agentInput      = document.getElementById('agentInput');
+        const agentSend       = document.getElementById('agentSend');
+        const endChatBtn      = document.getElementById('endChatBtn');
+        const notifBanner     = document.getElementById('notifBanner');
+        const notifAllowBtn   = document.getElementById('notifAllowBtn');
+        const notifDismissBtn = document.getElementById('notifDismissBtn');
+
+        /* ── DESKTOP NOTIFICATION HELPERS ── */
+
+        function sendAgentAlertNotification(title, body) {
+            if (Notification.permission !== 'granted') return;
+            const notif = new Notification(title, {
+                body,
+                icon: 'img/logo.svg',
+                badge: 'img/logo.svg',
+                tag: 'agent-request',          // replaces previous notif of same type
+                renotify: true                  // still chimes even if tag already exists
+            });
+            // Clicking the notification focuses the agent tab
+            notif.onclick = () => {
+                window.focus();
+                notif.close();
+            };
+        }
+
+        function requestNotificationPermission() {
+            return new Promise((resolve) => {
+                if (!('Notification' in window)) { resolve(false); return; }
+                Notification.requestPermission().then(result => resolve(result === 'granted'));
+            });
+        }
+
+        function showNotifPermissionBanner() {
+            if (Notification.permission === 'denied') return;   // browser blocked it; can't ask
+            notifBanner.style.display = 'flex';
+        }
+
+        // Banner "Allow" button
+        notifAllowBtn.addEventListener('click', async () => {
+            notifBanner.style.display = 'none';
+            const granted = await requestNotificationPermission();
+            if (granted) {
+                sendAgentAlertNotification(
+                    '🔔 Notifications enabled',
+                    'You will now receive alerts for incoming chat requests.'
+                );
+            }
+        });
+
+        // Banner dismiss
+        notifDismissBtn.addEventListener('click', () => {
+            notifBanner.style.display = 'none';
+        });
+
+        /* ── MAIN NOTIFICATION TRIGGER ──
+           Called every time a new TRANSFER_REQUEST arrives.
+           Mirrors the logic from the client side, adapted for the agent. */
+        async function notifyAgentOfRequest(userName, lastMessage) {
+            if (Notification.permission === 'granted') {
+                sendAgentAlertNotification(
+                    '💬 Live Agent Requested',
+                    `${userName}: ${lastMessage || 'A new client is asking to speak with a live agent.'}`
+                );
+            } else if (Notification.permission !== 'denied') {
+                // Show the in-app banner first, then ask for permission
+                showNotifPermissionBanner();
+                const granted = await requestNotificationPermission();
+                if (granted) {
+                    notifBanner.style.display = 'none';
+                    sendAgentAlertNotification(
+                        '💬 Live Agent Requested',
+                        `${userName}: ${lastMessage || 'A new client is asking to speak with a live agent. Click to open the agent dashboard.'}`
+                    );
+                }
+            }
+            // If 'denied', fall through silently — toast still shows in-app.
+        }
+
+        /* ── LOGIN / LOGOUT ── */
 
         function goOnline() {
             const name = agentNameInput.value.trim();
             if (!name) { agentNameInput.style.borderColor = '#ef4444'; return; }
             agentName = name;
             loginScreen.style.display = 'none';
-            agentPanel.style.display = 'flex';
+            agentPanel.style.display  = 'flex';
             topbarName.textContent = agentName;
             broadcastOnline();
             heartbeatTimer = setInterval(broadcastOnline, 8000);
+
+            // Prompt for notification permission as soon as agent goes online
+            if ('Notification' in window && Notification.permission === 'default') {
+                showNotifPermissionBanner();
+            }
         }
 
         loginBtn.addEventListener('click', goOnline);
@@ -769,36 +755,45 @@
         logoutBtn.addEventListener('click', () => {
             bc.postMessage({ type: 'AGENT_OFFLINE', agentName });
             clearInterval(heartbeatTimer);
-            agentPanel.style.display = 'none';
+            agentPanel.style.display  = 'none';
             loginScreen.style.display = 'flex';
+            notifBanner.style.display = 'none';
             agentNameInput.value = '';
             agentName = '';
             activeChatId = null;
             Object.keys(chats).forEach(k => delete chats[k]);
             renderSidebar();
             showPlaceholder();
-            window.location.href = "agent.html";
+            window.location.href = 'agent.html';
         });
 
         function broadcastOnline() {
             bc.postMessage({ type: 'AGENT_ONLINE', agentName });
         }
 
-        bc.onmessage = (e) => {
+        /* ── BROADCAST CHANNEL ── */
+
+        bc.onmessage = async (e) => {
             const msg = e.data;
 
             if (msg.type === 'TRANSFER_REQUEST') {
                 if (!chats[msg.userId]) {
                     chats[msg.userId] = {
-                        userId: msg.userId,
-                        userName: msg.userName || 'Customer',
+                        userId:      msg.userId,
+                        userName:    msg.userName || 'Customer',
                         lastMessage: msg.lastMessage || '',
-                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        status: 'pending',
-                        messages: []
+                        time:        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        status:      'pending',
+                        messages:    []
                     };
                     renderSidebar();
                     showToast(msg.userName || 'Customer', msg.lastMessage || 'Requesting an agent');
+
+                    // ── Fire desktop notification for the agent ──
+                    await notifyAgentOfRequest(
+                        msg.userName || 'Customer',
+                        msg.lastMessage || ''
+                    );
                 }
             }
 
@@ -819,6 +814,8 @@
                 renderSidebar();
             }
         };
+
+        /* ── SIDEBAR ── */
 
         function renderSidebar() {
             requestList.innerHTML = '';
@@ -848,12 +845,14 @@
 
                 const acceptBtn = card.querySelector('.btn-accept');
                 const denyBtn   = card.querySelector('.btn-deny');
-                if (acceptBtn) acceptBtn.addEventListener('click', (ev) => { ev.stopPropagation(); acceptChat(chat.userId); });
-                if (denyBtn)   denyBtn.addEventListener('click',   (ev) => { ev.stopPropagation(); denyChat(chat.userId); });
+                if (acceptBtn) acceptBtn.addEventListener('click', ev => { ev.stopPropagation(); acceptChat(chat.userId); });
+                if (denyBtn)   denyBtn.addEventListener('click',   ev => { ev.stopPropagation(); denyChat(chat.userId); });
                 card.addEventListener('click', () => openChat(chat.userId));
                 requestList.appendChild(card);
             });
         }
+
+        /* ── CHAT ACTIONS ── */
 
         function acceptChat(userId) {
             const chat = chats[userId];
@@ -879,9 +878,9 @@
             if (!chat) return;
             activeChatId = userId;
             chatPlaceholder.style.display = 'none';
-            activeChatEl.style.display = 'flex';
-            activeChatName.textContent = chat.userName;
-            activeChatSub.textContent = chat.status === 'live' ? 'Live session' : 'Pending acceptance';
+            activeChatEl.style.display    = 'flex';
+            activeChatName.textContent    = chat.userName;
+            activeChatSub.textContent     = chat.status === 'live' ? 'Live session' : 'Pending acceptance';
             renderMessages(userId);
             renderSidebar();
             agentInput.focus();
@@ -889,7 +888,7 @@
 
         function showPlaceholder() {
             chatPlaceholder.style.display = 'flex';
-            activeChatEl.style.display = 'none';
+            activeChatEl.style.display    = 'none';
         }
 
         function renderMessages(userId) {
@@ -935,7 +934,9 @@
         }
 
         agentSend.addEventListener('click', sendAgentMessage);
-        agentInput.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAgentMessage(); } });
+        agentInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAgentMessage(); }
+        });
 
         endChatBtn.addEventListener('click', () => {
             if (!activeChatId) return;
@@ -946,6 +947,8 @@
             activeChatId = null;
             showPlaceholder();
         });
+
+        /* ── TOAST ── */
 
         function showToast(userName, preview) {
             const toast = document.createElement('div');
