@@ -2,10 +2,9 @@
 
 The admin dashboard for the UmbrellaNET FAQ assistant and its live chat widget. It is a static website, hosted on Vercel. Team members sign in with Firebase Authentication, then browse saved conversations, check usage analytics, take over chats as a live agent and follow up on missed agent requests.
 
-Live site: [https://your-dashboard.vercel.app]
-Backend: https://github.com/UmbrellaNET/FAQ (also hosted on Vercel, at https://faq-two-murex.vercel.app)
+Live site: [https://umbrellanet.github.io/FAQDashboard.github.io/]
+Backend: https://github.com/UmbrellaNET/FAQ
 
-> Items in [square brackets] are details I could not confirm. I have seen `index.html`, `index2.html`, `agent.html`, `chats.html` and `analytics.html`, but not `missed.html`, `profile.html`, `register.html` or `forgot-password.html`.
 
 ## Contents
 
