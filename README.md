@@ -1,4 +1,4 @@
-# FAQ Dashboard
+# FAQ Dashboard 
 
 The admin dashboard for the UmbrellaNET FAQ assistant and its live chat widget. It is a static website, hosted on Vercel. Team members sign in with Firebase Authentication, then browse saved conversations, check usage analytics, take over chats as a live agent and follow up on missed agent requests.
 
