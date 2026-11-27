@@ -1,530 +1,200 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Panel – Umbrella Labs</title>
+    <link rel="icon" type="image/svg+xml" href="img/logo.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --surface2: #0f172a;
+            --bg: #0f172a; --surface: #1e293b; --surface2: #0f172a;
             --border: rgba(235, 178, 230, 0.25);
-            --accent: #EBB2E6;
-            --accent2: #5E185B;
-            --blue: #38bdf8;
-            --green: #10b981;
-            --amber: #f59e0b;
-            --red: #ef4444;
-            --text: #f1f5f9;
-            --muted: #94a3b8;
-            --msg-agent: rgba(104, 61, 102, 0.85);
-            --msg-user: rgba(129, 140, 248, 0.2);
-            --nav-bg: #2a2740;
-            --nav-primary: #5E185B;
-            --nav-text: #f1e6f9;
-            --nav-muted: #2b2b44;
+            --accent: #EBB2E6; --accent2: #5E185B;
+            --blue: #38bdf8; --green: #10b981; --amber: #f59e0b; --red: #ef4444;
+            --text: #f1f5f9; --muted: #94a3b8;
+            --msg-agent: rgba(104, 61, 102, 0.85); --msg-user: rgba(129, 140, 248, 0.2);
+            --nav-bg: #2a2740; --nav-primary: #5E185B; --nav-text: #f1e6f9; --nav-muted: #2b2b44;
         }
 
         body {
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
+            background: var(--bg); color: var(--text); min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
 
-        /* ── NAV SIDEBAR ── */
+        /* ── Nav sidebar ── */
         .nav-sidebar {
-            width: 240px;
-            background: var(--nav-bg);
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            border-right: 1px solid #333;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
+            width: 240px; background: var(--nav-bg); padding: 20px; height: 100vh;
+            position: fixed; top: 0; left: 0; border-right: 1px solid #333; z-index: 100;
+            display: flex; flex-direction: column;
         }
-
-        .nav-brand {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .nav-logo {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-        }
-
-        .nav-logo img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-        }
-
-        .nav-brand h1 {
-            font-size: 18px;
-            margin: 0;
-            color: #fff;
-        }
-
-        .nav-brand .nav-sub {
-            font-size: 12px;
-            color: white;
-        }
-
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .nav-links a {
-            color: var(--nav-text);
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
+        .nav-brand { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
+        .nav-logo { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
+        .nav-logo img { width: 60px; height: 60px; object-fit: contain; }
+        .nav-brand h1 { font-size: 18px; color: #fff; }
+        .nav-brand .nav-sub { font-size: 12px; color: #fff; }
+        .nav-links { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .nav-links a { color: var(--nav-text); text-decoration: none; padding: 10px; border-radius: 8px; font-size: 14px; display: flex; align-items: center; }
         .nav-links a:hover { background: var(--nav-muted); }
-        .nav-links a.active { background: var(--nav-primary); color: white; }
-
-        /* ── MAIN WRAPPER ── */
-        .app-wrapper {
-            margin-left: 240px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+        .nav-links a.active { background: var(--nav-primary); color: #fff; }
+        #missedBadge {
+            background: var(--red); color: #fff; font-size: 11px; font-weight: 700;
+            min-width: 20px; height: 20px; border-radius: 10px; display: none;
+            align-items: center; justify-content: center; margin-left: auto; padding: 0 5px;
         }
 
-        /* ── NOTIFICATION PERMISSION BANNER ── */
+        /* ── Main wrapper ── */
+        .app-wrapper { margin-left: 240px; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* ── Notification banner ── */
         #notifBanner {
-            display: none;
-            align-items: center;
-            gap: 14px;
+            display: none; align-items: center; gap: 14px;
             background: linear-gradient(90deg, rgba(94,24,91,0.6), rgba(235,178,230,0.12));
             border-bottom: 1px solid rgba(235,178,230,0.3);
-            padding: 11px 22px;
-            font-size: 13px;
-            color: var(--text);
-            position: sticky;
-            top: 0;
-            z-index: 50;
+            padding: 11px 22px; font-size: 13px; position: sticky; top: 0; z-index: 50;
         }
-
-        #notifBanner i {
-            font-size: 18px;
-            color: var(--accent);
-            flex-shrink: 0;
-        }
-
+        #notifBanner i { font-size: 18px; color: var(--accent); flex-shrink: 0; }
         #notifBanner span { flex: 1; }
-
         #notifBanner .btn-allow {
-            background: linear-gradient(to right, var(--accent2), var(--accent));
-            border: none;
-            border-radius: 8px;
-            padding: 7px 16px;
-            color: white;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: opacity 0.2s;
+            background: linear-gradient(to right, var(--accent2), var(--accent)); border: none;
+            border-radius: 8px; padding: 7px 16px; color: #fff; font-size: 13px; font-weight: 700;
+            cursor: pointer; white-space: nowrap; transition: opacity 0.2s;
         }
-
         #notifBanner .btn-allow:hover { opacity: 0.85; }
-
-        #notifBanner .btn-dismiss {
-            background: none;
-            border: none;
-            color: var(--muted);
-            font-size: 16px;
-            cursor: pointer;
-            padding: 4px 6px;
-            line-height: 1;
-            transition: color 0.2s;
-        }
-
+        #notifBanner .btn-dismiss { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px 6px; }
         #notifBanner .btn-dismiss:hover { color: var(--text); }
 
-        /* ── LOGIN SCREEN ── */
-        #loginScreen {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
+        /* ── Go-online screen ── */
+        #loginScreen { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .login-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 40px 36px;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+            padding: 40px 36px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            display: flex; flex-direction: column; gap: 20px;
         }
-
-        .login-card h1 {
-            font-size: 1.6rem;
-            background: var(--accent);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-align: center;
-        }
-
+        .login-card h1 { font-size: 1.6rem; background: var(--accent); -webkit-background-clip: text; background-clip: text; color: transparent; text-align: center; }
         .login-card p { font-size: 14px; color: var(--muted); text-align: center; }
         .login-card label { font-size: 13px; color: var(--muted); margin-bottom: -12px; }
-
         .login-card input {
-            padding: 11px 15px;
-            border-radius: 11px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            padding: 11px 15px; border-radius: 11px; background: var(--surface2); border: 1px solid var(--border);
+            color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
         }
-
-        .login-card input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(235,178,230,0.15);
-        }
-
+        .login-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(235,178,230,0.15); }
         .login-card .btn-primary {
-            padding: 12px;
-            border-radius: 11px;
-            background: linear-gradient(to right, var(--accent2), var(--accent));
-            border: none;
-            color: white;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: opacity 0.2s;
+            padding: 12px; border-radius: 11px; background: linear-gradient(to right, var(--accent2), var(--accent));
+            border: none; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
         }
-
         .login-card .btn-primary:hover { opacity: 0.88; }
+        .login-card .btn-primary:disabled { opacity: 0.5; cursor: default; }
+        .login-card .link-btn { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; text-align: center; }
+        .login-card .link-btn:hover { color: var(--text); }
 
-        /* ── AGENT PANEL ── */
-        #agentPanel {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-        }
-
+        /* ── Agent panel ── */
+        #agentPanel { flex: 1; display: none; flex-direction: column; }
         .topbar {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+            position: sticky; top: 0; z-index: 10;
         }
-
         .topbar-left { display: flex; align-items: center; gap: 14px; }
-
         .topbar-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--blue), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: white;
+            width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--accent));
+            display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff;
         }
-
         .topbar h2 { font-size: 1.1rem; font-weight: 700; }
         .topbar .subtitle { font-size: 12px; color: var(--muted); }
-
         .status-badge { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; }
-
-        .status-dot-lg {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--green);
-            animation: pulse-dot 2s infinite;
-        }
-
+        .status-dot-lg { width: 10px; height: 10px; border-radius: 50%; background: var(--green); animation: pulse-dot 2s infinite; }
+        .status-dot-lg.warn { background: var(--amber); }
         .btn-logout {
-            background: none;
-            border: 1px solid rgba(239,68,68,0.4);
-            color: var(--red);
-            border-radius: 9px;
-            padding: 7px 14px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.2s;
+            background: none; border: 1px solid rgba(239,68,68,0.4); color: var(--red);
+            border-radius: 9px; padding: 7px 14px; font-size: 13px; cursor: pointer; transition: background 0.2s;
         }
-
         .btn-logout:hover { background: rgba(239,68,68,0.1); }
+        .panel-body { flex: 1; display: grid; grid-template-columns: 280px 1fr; min-height: 0; height: calc(100vh - 69px); }
 
-        .panel-body {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            min-height: 0;
-            height: calc(100vh - 69px);
-        }
-
-        /* ── Sidebar ── */
-        .sidebar {
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
+        /* ── Chat list ── */
+        .sidebar { background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
         .sidebar-title {
-            padding: 16px 18px 10px;
-            font-size: 11px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--muted);
-            font-weight: 700;
-            border-bottom: 1px solid var(--border);
+            padding: 16px 18px 10px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--muted); font-weight: 700; border-bottom: 1px solid var(--border);
         }
-
-        #requestList {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
+        #requestList { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
         .empty-state i { font-size: 28px; margin-bottom: 10px; display: block; opacity: 0.4; }
-
         .request-card {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-            cursor: pointer;
-            transition: border-color 0.2s, background 0.2s;
+            background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+            cursor: pointer; transition: border-color 0.2s, background 0.2s;
         }
-
         .request-card:hover { border-color: var(--accent); background: rgba(235,178,230,0.04); }
         .request-card.active { border-color: var(--accent); background: rgba(235,178,230,0.07); }
-
         .rc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
         .rc-name { font-size: 14px; font-weight: 700; }
         .rc-time { font-size: 11px; color: var(--muted); }
         .rc-preview { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 10px; }
         .rc-actions { display: flex; gap: 8px; }
-
-        .btn-accept, .btn-deny {
-            flex: 1;
-            padding: 7px;
-            border-radius: 8px;
-            border: none;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .btn-accept { background: var(--green); color: white; }
+        .btn-accept, .btn-deny { flex: 1; padding: 7px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+        .btn-accept { background: var(--green); color: #fff; }
         .btn-deny { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
         .btn-accept:hover, .btn-deny:hover { opacity: 0.82; }
-
-        .rc-live-badge {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--green);
-            background: rgba(16,185,129,0.12);
-            border-radius: 20px;
-            padding: 3px 9px;
-        }
+        .btn-accept:disabled, .btn-deny:disabled { opacity: 0.5; cursor: default; }
+        .rc-live-badge { font-size: 11px; font-weight: 700; color: var(--green); background: rgba(16,185,129,0.12); border-radius: 20px; padding: 3px 9px; }
 
         /* ── Chat area ── */
         .chat-area { display: flex; flex-direction: column; background: var(--bg); }
-
-        .chat-placeholder {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--muted);
-            gap: 14px;
-        }
-
+        .chat-placeholder { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); gap: 14px; }
         .chat-placeholder i { font-size: 48px; opacity: 0.2; }
         .chat-placeholder p { font-size: 15px; }
-
         #activeChat { display: none; flex-direction: column; flex: 1; min-height: 0; }
-
-        .chat-top {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 22px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
+        .chat-top { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; }
         .chat-top-info h3 { font-size: 15px; font-weight: 700; }
         .chat-top-info p { font-size: 12px; color: var(--muted); }
-
         .btn-end {
-            background: none;
-            border: 1px solid rgba(239,68,68,0.4);
-            color: var(--red);
-            border-radius: 9px;
-            padding: 7px 16px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
+            background: none; border: 1px solid rgba(239,68,68,0.4); color: var(--red); border-radius: 9px;
+            padding: 7px 16px; font-size: 13px; cursor: pointer; font-weight: 600; transition: background 0.2s;
         }
-
         .btn-end:hover { background: rgba(239,68,68,0.1); }
-
-        .messages-wrap {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .msg {
-            max-width: 75%;
-            padding: 13px 16px;
-            border-radius: 18px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
+        .messages-wrap { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+        .msg { max-width: 75%; padding: 13px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
         .msg-user { background: var(--msg-user); align-self: flex-start; border-bottom-left-radius: 5px; }
         .msg-agent { background: var(--msg-agent); align-self: flex-end; border-bottom-right-radius: 5px; }
         .msg-ts { font-size: 11px; color: var(--muted); margin-top: 4px; text-align: right; }
         .msg-label { font-size: 10px; font-weight: 700; margin-bottom: 3px; color: var(--muted); }
-
         .system-notice {
-            text-align: center;
-            font-size: 12px;
-            color: var(--muted);
-            padding: 6px 14px;
-            border: 1px dashed rgba(206,62,192,0.4);
-            border-radius: 20px;
-            margin: 2px auto;
-            max-width: 90%;
+            text-align: center; font-size: 12px; color: var(--muted); padding: 6px 14px;
+            border: 1px dashed rgba(206,62,192,0.4); border-radius: 20px; margin: 2px auto; max-width: 90%;
         }
-
-        .input-area {
-            padding: 16px 20px 20px;
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 10px;
-        }
-
+        .input-area { padding: 16px 20px 20px; background: var(--surface); border-top: 1px solid var(--border); display: flex; gap: 10px; }
         .input-area input {
-            flex: 1;
-            padding: 11px 16px;
-            border-radius: 12px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 14px;
-            outline: none;
+            flex: 1; padding: 11px 16px; border-radius: 12px; background: var(--surface2);
+            border: 1px solid var(--border); color: var(--text); font-size: 14px; outline: none;
         }
-
-        .input-area input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(235,178,230,0.15);
-        }
-
+        .input-area input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(235,178,230,0.15); }
+        .input-area input:disabled { opacity: 0.5; }
         .input-area button {
-            background: linear-gradient(to right, var(--accent2), var(--accent));
-            border: none;
-            border-radius: 12px;
-            width: 48px;
-            color: white;
-            font-size: 17px;
-            cursor: pointer;
-            transition: opacity 0.2s;
+            background: linear-gradient(to right, var(--accent2), var(--accent)); border: none; border-radius: 12px;
+            width: 48px; color: #fff; font-size: 17px; cursor: pointer; transition: opacity 0.2s;
         }
-
         .input-area button:hover { opacity: 0.88; }
+        .input-area button:disabled { opacity: 0.4; cursor: default; }
 
-        /* Toast */
+        /* ── Toasts ── */
         .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            background: var(--surface);
-            border: 1px solid var(--accent);
-            border-radius: 14px;
-            padding: 14px 18px;
-            min-width: 280px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            animation: slideInRight 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            position: fixed; top: 20px; right: 20px; z-index: 9999; background: var(--surface);
+            border: 1px solid var(--accent); border-radius: 14px; padding: 14px 18px; min-width: 280px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4); animation: slideInRight 0.3s ease;
+            display: flex; align-items: center; gap: 12px;
         }
-
         .toast i { font-size: 20px; color: var(--accent); }
+        .toast.error { border-color: var(--red); }
+        .toast.error i { color: var(--red); }
         .toast-body p:first-child { font-size: 14px; font-weight: 700; }
         .toast-body p:last-child { font-size: 12px; color: var(--muted); }
 
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(30px); }
-            to   { opacity: 1; transform: translateX(0); }
-        }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 
         @media (max-width: 700px) {
             .nav-sidebar { display: none; }
@@ -536,12 +206,10 @@
 </head>
 <body>
 
-    <!-- NAV SIDEBAR -->
+    <!-- Menu -->
     <aside class="nav-sidebar">
         <div class="nav-brand">
-            <div class="nav-logo">
-                <img src="img/logo.svg" alt="">
-            </div>
+            <div class="nav-logo"><img src="img/logo.svg" alt=""></div>
             <div>
                 <h1>UmbrellaNet</h1>
                 <div class="nav-sub">Admin Dashboard</div>
@@ -551,31 +219,14 @@
             <a href="chats.html">Chats</a>
             <a href="analytics.html">Analytics</a>
             <a href="agent.html" class="active">Agent</a>
-            <a href="missed.html">
-                Missed Agent Requests
-                <span id="missedBadge" style="
-                    background:#ef4444;
-                    color:white;
-                    font-size:11px;
-                    font-weight:700;
-                    min-width:20px;
-                    height:20px;
-                    border-radius:10px;
-                    display:none;
-                    align-items:center;
-                    justify-content:center;
-                    margin-left:auto;
-                    padding:0 5px;
-                  ">0</span>
-            </a>
+            <a href="missed.html">Missed Agent Requests <span id="missedBadge">0</span></a>
             <a href="index2.html">Dashboard</a>
         </nav>
     </aside>
 
-    <!-- MAIN APP WRAPPER -->
     <div class="app-wrapper">
 
-        <!-- NOTIFICATION PERMISSION BANNER -->
+        <!-- Desktop notification permission banner -->
         <div id="notifBanner">
             <i class="fas fa-bell"></i>
             <span>Enable desktop notifications so you never miss an incoming chat request.</span>
@@ -583,18 +234,19 @@
             <button class="btn-dismiss" id="notifDismissBtn" title="Dismiss">&#x2715;</button>
         </div>
 
-        <!-- LOGIN -->
+        <!-- Go online -->
         <div id="loginScreen">
             <div class="login-card">
                 <h1><i class="fas fa-headset"></i> Agent Panel</h1>
-                <p>Enter your name to go online and start receiving chat requests.</p>
+                <p>Choose the name visitors will see, then go online to receive chat requests.</p>
                 <label for="agentNameInput">Your name</label>
                 <input type="text" id="agentNameInput" placeholder="e.g. Sarah" maxlength="40" autocomplete="off">
                 <button class="btn-primary" id="loginBtn">Go Online <i class="fas fa-arrow-right"></i></button>
+                <button class="link-btn" id="signOutBtn" type="button">Sign out</button>
             </div>
         </div>
 
-        <!-- AGENT PANEL -->
+        <!-- Agent panel -->
         <div id="agentPanel">
             <div class="topbar">
                 <div class="topbar-left">
@@ -622,7 +274,7 @@
                     </div>
                 </div>
 
-                <div class="chat-area" id="chatArea">
+                <div class="chat-area">
                     <div class="chat-placeholder" id="chatPlaceholder">
                         <i class="fas fa-comments"></i>
                         <p>Select a chat from the sidebar</p>
@@ -638,7 +290,7 @@
                         </div>
                         <div class="messages-wrap" id="messagesWrap"></div>
                         <div class="input-area">
-                            <input type="text" id="agentInput" placeholder="Type a message…" autocomplete="off">
+                            <input type="text" id="agentInput" placeholder="Type a message…" autocomplete="off" maxlength="2000">
                             <button id="agentSend"><i class="fas fa-paper-plane"></i></button>
                         </div>
                     </div>
@@ -648,387 +300,434 @@
 
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/missed-badge.js"></script>
+
     <script>
-        const CHANNEL = 'umbrellanet_livechat';
-        const bc = new BroadcastChannel(CHANNEL);
+        const POLL_MS = 3000;          // how often to check for new requests and messages
+        const HEARTBEAT_EVERY = 3;     // heartbeat every 3rd poll (about 9 seconds)
 
+        const $ = (id) => document.getElementById(id);
+
+        let me = null;                 // signed-in Firebase user
         let agentName = '';
-        let heartbeatTimer = null;
+        let online = false;
+        let polling = false;
+        let ticker = null;
+        let tickCount = 0;
+        let lastMsgId = 0;
+        let firstPoll = true;
         let activeChatId = null;
-        const chats = {};
 
-        const loginScreen     = document.getElementById('loginScreen');
-        const agentPanel      = document.getElementById('agentPanel');
-        const agentNameInput  = document.getElementById('agentNameInput');
-        const loginBtn        = document.getElementById('loginBtn');
-        const topbarName      = document.getElementById('topbarName');
-        const logoutBtn       = document.getElementById('logoutBtn');
-        const requestList     = document.getElementById('requestList');
-        const emptyState      = document.getElementById('emptyState');
-        const chatPlaceholder = document.getElementById('chatPlaceholder');
-        const activeChatEl    = document.getElementById('activeChat');
-        const activeChatName  = document.getElementById('activeChatName');
-        const activeChatSub   = document.getElementById('activeChatSub');
-        const messagesWrap    = document.getElementById('messagesWrap');
-        const agentInput      = document.getElementById('agentInput');
-        const agentSend       = document.getElementById('agentSend');
-        const endChatBtn      = document.getElementById('endChatBtn');
-        const notifBanner     = document.getElementById('notifBanner');
-        const notifAllowBtn   = document.getElementById('notifAllowBtn');
-        const notifDismissBtn = document.getElementById('notifDismissBtn');
+        const chats = {};              // chat id -> { id, userName, lastMessage, time, status, agentEmail, messages, msgIds }
+        const dismissed = new Set();   // requests this agent declined (hidden for this agent only)
 
-        /* ── DESKTOP NOTIFICATION HELPERS ── */
+        /* ── Start-up: require a signed-in user ── */
+
+        requireSignIn((user) => {
+            me = user;
+            $('agentNameInput').value = (user.displayName || (user.email || '').split('@')[0]).slice(0, 40);
+            startMissedBadge();
+        });
+
+        /* ── Desktop notifications ── */
 
         function sendAgentAlertNotification(title, body) {
-            if (Notification.permission !== 'granted') return;
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
             const notif = new Notification(title, {
-                body,
-                icon: 'img/logo.svg',
-                badge: 'img/logo.svg',
-                tag: 'agent-request',          // replaces previous notif of same type
-                renotify: true                  // still chimes even if tag already exists
+                body, icon: 'img/logo.svg', badge: 'img/logo.svg',
+                tag: 'agent-request', renotify: true
             });
-            // Clicking the notification focuses the agent tab
-            notif.onclick = () => {
-                window.focus();
-                notif.close();
-            };
+            notif.onclick = () => { window.focus(); notif.close(); };
         }
 
         function requestNotificationPermission() {
-            return new Promise((resolve) => {
-                if (!('Notification' in window)) { resolve(false); return; }
-                Notification.requestPermission().then(result => resolve(result === 'granted'));
-            });
+            if (!('Notification' in window)) return Promise.resolve(false);
+            return Notification.requestPermission().then((r) => r === 'granted');
         }
 
         function showNotifPermissionBanner() {
-            if (Notification.permission === 'denied') return;   // browser blocked it; can't ask
-            notifBanner.style.display = 'flex';
+            if (!('Notification' in window) || Notification.permission !== 'default') return;
+            $('notifBanner').style.display = 'flex';
         }
 
-        // Banner "Allow" button
-        notifAllowBtn.addEventListener('click', async () => {
-            notifBanner.style.display = 'none';
-            const granted = await requestNotificationPermission();
-            if (granted) {
-                sendAgentAlertNotification(
-                    '🔔 Notifications enabled',
-                    'You will now receive alerts for incoming chat requests.'
-                );
+        $('notifAllowBtn').addEventListener('click', async () => {
+            $('notifBanner').style.display = 'none';
+            if (await requestNotificationPermission()) {
+                sendAgentAlertNotification('🔔 Notifications enabled', 'You will now receive alerts for incoming chat requests.');
             }
         });
+        $('notifDismissBtn').addEventListener('click', () => { $('notifBanner').style.display = 'none'; });
 
-        // Banner dismiss
-        notifDismissBtn.addEventListener('click', () => {
-            notifBanner.style.display = 'none';
-        });
+        /* ── Toasts ── */
 
-        /* ── MAIN NOTIFICATION TRIGGER ──
-           Called every time a new TRANSFER_REQUEST arrives.
-           Mirrors the logic from the client side, adapted for the agent. */
-        async function notifyAgentOfRequest(userName, lastMessage) {
-            if (Notification.permission === 'granted') {
-                sendAgentAlertNotification(
-                    '💬 Live Agent Requested',
-                    `${userName}: ${lastMessage || 'A new client is asking to speak with a live agent.'}`
-                );
-            } else if (Notification.permission !== 'denied') {
-                // Show the in-app banner first, then ask for permission
-                showNotifPermissionBanner();
-                const granted = await requestNotificationPermission();
-                if (granted) {
-                    notifBanner.style.display = 'none';
-                    sendAgentAlertNotification(
-                        '💬 Live Agent Requested',
-                        `${userName}: ${lastMessage || 'A new client is asking to speak with a live agent. Click to open the agent dashboard.'}`
-                    );
-                }
-            }
-            // If 'denied', fall through silently — toast still shows in-app.
-        }
-
-        // ── Missed requests badge (all pages) ────────────────────────────────────
-        (async function () {
-          const UPSTASH_URL   = 'https://quiet-snapper-78920.upstash.io';
-          const UPSTASH_TOKEN = 'gQAAAAAAATRIAAIncDFmMTQwZmQyMTcyNDY0MWNkYmZkOGY0MDM3MjljODM3N3AxNzg5MjA';
-        
-          async function upstash(path) {
-            const r = await fetch(UPSTASH_URL + path, {
-              headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
-            });
-            return r.json();
-          }
-        
-          async function refreshMissedBadge() {
-            try {
-              const lenRes  = await upstash('/llen/umbrellanet_missed_requests');
-              const total   = lenRes.result || 0;
-              const seenRes = await upstash('/smembers/umbrellanet_missed_seen');
-              const seen    = (seenRes.result || []).length;
-              const unseen  = Math.max(0, total - seen);
-              const badge   = document.getElementById('missedBadge');
-              if (!badge) return;
-              badge.textContent = unseen;
-              badge.style.display = unseen > 0 ? 'inline-flex' : 'none';
-            } catch (e) {
-              console.warn('Badge fetch failed', e);
-            }
-          }
-        
-          // Run immediately on every page load/reload
-          refreshMissedBadge();
-        
-          // Re-check every 15 seconds
-          setInterval(refreshMissedBadge, 15000);
-        
-          // Also update instantly when customer submits details in same browser
-          const bc = new BroadcastChannel('umbrellanet_livechat');
-          bc.onmessage = (ev) => {
-            if (ev.data?.type === 'MISSED_REQUEST') refreshMissedBadge();
-          };
-        
-          // Re-run when tab becomes visible again (e.g. user switches back to this tab)
-          document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') refreshMissedBadge();
-          });
-        
-        })();
-        /* ── LOGIN / LOGOUT ── */
-
-        function goOnline() {
-            const name = agentNameInput.value.trim();
-            if (!name) { agentNameInput.style.borderColor = '#ef4444'; return; }
-            agentName = name;
-            loginScreen.style.display = 'none';
-            agentPanel.style.display  = 'flex';
-            topbarName.textContent = agentName;
-            broadcastOnline();
-            heartbeatTimer = setInterval(broadcastOnline, 8000);
-
-            // Prompt for notification permission as soon as agent goes online
-            if ('Notification' in window && Notification.permission === 'default') {
-                showNotifPermissionBanner();
-            }
-        }
-
-        loginBtn.addEventListener('click', goOnline);
-        agentNameInput.addEventListener('keypress', e => { if (e.key === 'Enter') goOnline(); });
-
-        logoutBtn.addEventListener('click', () => {
-            bc.postMessage({ type: 'AGENT_OFFLINE', agentName });
-            clearInterval(heartbeatTimer);
-            agentPanel.style.display  = 'none';
-            loginScreen.style.display = 'flex';
-            notifBanner.style.display = 'none';
-            agentNameInput.value = '';
-            agentName = '';
-            activeChatId = null;
-            Object.keys(chats).forEach(k => delete chats[k]);
-            renderSidebar();
-            showPlaceholder();
-            window.location.href = 'agent.html';
-        });
-
-        function broadcastOnline() {
-            bc.postMessage({ type: 'AGENT_ONLINE', agentName });
-        }
-
-        /* ── BROADCAST CHANNEL ── */
-
-        bc.onmessage = async (e) => {
-            const msg = e.data;
-
-            if (msg.type === 'TRANSFER_REQUEST') {
-                if (!chats[msg.userId]) {
-                    chats[msg.userId] = {
-                        userId:      msg.userId,
-                        userName:    msg.userName || 'Customer',
-                        lastMessage: msg.lastMessage || '',
-                        time:        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        status:      'pending',
-                        messages:    []
-                    };
-                    renderSidebar();
-                    showToast(msg.userName || 'Customer', msg.lastMessage || 'Requesting an agent');
-
-                    // ── Fire desktop notification for the agent ──
-                    await notifyAgentOfRequest(
-                        msg.userName || 'Customer',
-                        msg.lastMessage || ''
-                    );
-                }
-            }
-
-            if (msg.type === 'USER_MSG' && chats[msg.userId] && chats[msg.userId].status === 'live') {
-                const chat = chats[msg.userId];
-                chat.messages.push({ from: 'user', text: msg.text, time: msg.time });
-                if (activeChatId === msg.userId) renderMessages(msg.userId);
-                renderSidebar();
-            }
-
-            if (msg.type === 'USER_DISCONNECT' && chats[msg.userId]) {
-                const chat = chats[msg.userId];
-                if (chat.status === 'live' && activeChatId === msg.userId) {
-                    addSystemMsg(msg.userId, '🔴 User disconnected');
-                    renderMessages(msg.userId);
-                }
-                chat.status = 'ended';
-                renderSidebar();
-            }
-        };
-
-        /* ── SIDEBAR ── */
-
-        function renderSidebar() {
-            requestList.innerHTML = '';
-            const entries = Object.values(chats).filter(c => c.status !== 'ended');
-            if (!entries.length) { requestList.appendChild(emptyState); return; }
-
-            entries.forEach(chat => {
-                const card = document.createElement('div');
-                card.className = `request-card ${chat.status} ${activeChatId === chat.userId ? 'active' : ''}`;
-                card.dataset.id = chat.userId;
-
-                card.innerHTML = `
-                    <div class="rc-header">
-                        <span class="rc-name">${esc(chat.userName)}</span>
-                        <span class="rc-time">${chat.time}</span>
-                    </div>
-                    <div class="rc-preview">${esc(chat.lastMessage || '(no message)')}</div>
-                    ${chat.status === 'pending' ? `
-                        <div class="rc-actions">
-                            <button class="btn-accept" data-id="${chat.userId}"><i class="fas fa-check"></i> Accept</button>
-                            <button class="btn-deny"   data-id="${chat.userId}"><i class="fas fa-times"></i> Deny</button>
-                        </div>
-                    ` : `
-                        <span class="rc-live-badge"><i class="fas fa-circle" style="font-size:8px"></i> Live</span>
-                    `}
-                `;
-
-                const acceptBtn = card.querySelector('.btn-accept');
-                const denyBtn   = card.querySelector('.btn-deny');
-                if (acceptBtn) acceptBtn.addEventListener('click', ev => { ev.stopPropagation(); acceptChat(chat.userId); });
-                if (denyBtn)   denyBtn.addEventListener('click',   ev => { ev.stopPropagation(); denyChat(chat.userId); });
-                card.addEventListener('click', () => openChat(chat.userId));
-                requestList.appendChild(card);
-            });
-        }
-
-        /* ── CHAT ACTIONS ── */
-
-        function acceptChat(userId) {
-            const chat = chats[userId];
-            if (!chat) return;
-            chat.status = 'live';
-            addSystemMsg(userId, `✅ You accepted this chat as <strong>${agentName}</strong>`);
-            bc.postMessage({ type: 'AGENT_ACCEPT', userId, agentName });
-            openChat(userId);
-            renderSidebar();
-        }
-
-        function denyChat(userId) {
-            const chat = chats[userId];
-            if (!chat) return;
-            bc.postMessage({ type: 'AGENT_DENY', userId, agentName });
-            delete chats[userId];
-            if (activeChatId === userId) { activeChatId = null; showPlaceholder(); }
-            renderSidebar();
-        }
-
-        function openChat(userId) {
-            const chat = chats[userId];
-            if (!chat) return;
-            activeChatId = userId;
-            chatPlaceholder.style.display = 'none';
-            activeChatEl.style.display    = 'flex';
-            activeChatName.textContent    = chat.userName;
-            activeChatSub.textContent     = chat.status === 'live' ? 'Live session' : 'Pending acceptance';
-            renderMessages(userId);
-            renderSidebar();
-            agentInput.focus();
-        }
-
-        function showPlaceholder() {
-            chatPlaceholder.style.display = 'flex';
-            activeChatEl.style.display    = 'none';
-        }
-
-        function renderMessages(userId) {
-            const chat = chats[userId];
-            if (!chat) return;
-            messagesWrap.innerHTML = '';
-            chat.messages.forEach(m => {
-                if (m.system) {
-                    const d = document.createElement('div');
-                    d.className = 'system-notice';
-                    d.innerHTML = m.text;
-                    messagesWrap.appendChild(d);
-                } else {
-                    const d = document.createElement('div');
-                    d.className = `msg ${m.from === 'user' ? 'msg-user' : 'msg-agent'}`;
-                    d.innerHTML = `
-                        <div class="msg-label">${m.from === 'user' ? esc(chat.userName) : esc(agentName)}</div>
-                        ${esc(m.text)}
-                        <div class="msg-ts">${m.time}</div>
-                    `;
-                    messagesWrap.appendChild(d);
-                }
-            });
-            messagesWrap.scrollTop = messagesWrap.scrollHeight;
-        }
-
-        function addSystemMsg(userId, html) {
-            if (!chats[userId]) return;
-            chats[userId].messages.push({ system: true, text: html });
-        }
-
-        function sendAgentMessage() {
-            const text = agentInput.value.trim();
-            if (!text || !activeChatId) return;
-            const chat = chats[activeChatId];
-            if (!chat || chat.status !== 'live') return;
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            chat.messages.push({ from: 'agent', text, time });
-            bc.postMessage({ type: 'AGENT_MSG', userId: activeChatId, agentName, text });
-            renderMessages(activeChatId);
-            agentInput.value = '';
-            agentInput.focus();
-        }
-
-        agentSend.addEventListener('click', sendAgentMessage);
-        agentInput.addEventListener('keypress', e => {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAgentMessage(); }
-        });
-
-        endChatBtn.addEventListener('click', () => {
-            if (!activeChatId) return;
-            bc.postMessage({ type: 'AGENT_EXIT', userId: activeChatId, agentName });
-            addSystemMsg(activeChatId, '🔄 You ended this session');
-            chats[activeChatId].status = 'ended';
-            renderSidebar();
-            activeChatId = null;
-            showPlaceholder();
-        });
-
-        /* ── TOAST ── */
-
-        function showToast(userName, preview) {
+        function showToast(title, text, isError) {
             const toast = document.createElement('div');
-            toast.className = 'toast';
+            toast.className = 'toast' + (isError ? ' error' : '');
             toast.innerHTML = `
-                <i class="fas fa-comment-dots"></i>
-                <div class="toast-body">
-                    <p>New request from ${esc(userName)}</p>
-                    <p>${esc((preview || '').substring(0, 60))}</p>
-                </div>
-            `;
+                <i class="fas ${isError ? 'fa-circle-exclamation' : 'fa-comment-dots'}"></i>
+                <div class="toast-body"><p>${esc(title)}</p><p>${esc((text || '').substring(0, 80))}</p></div>`;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 5000);
         }
 
+        function showApiError(e) {
+            if (e.status === 403) showToast('Not allowed', 'Your account is not approved for the agent panel.', true);
+            else showToast('Something went wrong', e.message, true);
+        }
+
+        /* ── Go online / offline ── */
+
+        async function goOnline() {
+            const name = $('agentNameInput').value.trim();
+            if (!name) { $('agentNameInput').style.borderColor = '#ef4444'; return; }
+
+            $('loginBtn').disabled = true;
+            try {
+                await api('/api/admin/live/heartbeat', { method: 'POST', body: { agent_name: name } });
+            } catch (e) {
+                showApiError(e);
+                $('loginBtn').disabled = false;
+                return;
+            }
+
+            agentName = name;
+            online = true;
+            firstPoll = true;
+            lastMsgId = 0;
+            $('loginBtn').disabled = false;
+            $('loginScreen').style.display = 'none';
+            $('agentPanel').style.display = 'flex';
+            $('topbarName').textContent = agentName;
+            setConnection(true);
+            startTicker();
+            poll();
+            showNotifPermissionBanner();
+        }
+
+        async function goOffline() {
+            const live = Object.values(chats).filter((c) => c.status === 'live');
+            if (live.length && !confirm('You have active chats. End them and go offline?')) return;
+
+            online = false;
+            stopTicker();
+            await Promise.allSettled(live.map((c) => api(`/api/admin/live/chats/${c.id}/end`, { method: 'POST' })));
+            api('/api/admin/live/offline', { method: 'POST' }).catch(() => {});
+
+            Object.keys(chats).forEach((k) => delete chats[k]);
+            dismissed.clear();
+            activeChatId = null;
+            renderSidebar();
+            showPlaceholder();
+            $('notifBanner').style.display = 'none';
+            $('agentPanel').style.display = 'none';
+            $('loginScreen').style.display = 'flex';
+        }
+
+        $('loginBtn').addEventListener('click', goOnline);
+        $('agentNameInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') goOnline(); });
+        $('logoutBtn').addEventListener('click', goOffline);
+        $('signOutBtn').addEventListener('click', () => {
+            api('/api/admin/live/offline', { method: 'POST' }).catch(() => {}).finally(signOutAndExit);
+        });
+
+        /* ── Polling ──
+           A worker keeps the timer running when this tab is in the background,
+           where browsers slow normal timers down. */
+
+        function startTicker() {
+            stopTicker();
+            tickCount = 0;
+            const onTick = () => {
+                tickCount++;
+                poll();
+                if (tickCount % HEARTBEAT_EVERY === 0) {
+                    api('/api/admin/live/heartbeat', { method: 'POST', body: { agent_name: agentName } }).catch(() => {});
+                }
+            };
+            try {
+                const code = `setInterval(() => postMessage(1), ${POLL_MS});`;
+                const worker = new Worker(URL.createObjectURL(new Blob([code], { type: 'text/javascript' })));
+                worker.onmessage = onTick;
+                ticker = { stop: () => worker.terminate() };
+            } catch (e) {
+                const id = setInterval(onTick, POLL_MS);
+                ticker = { stop: () => clearInterval(id) };
+            }
+        }
+
+        function stopTicker() {
+            if (ticker) { ticker.stop(); ticker = null; }
+        }
+
+        function setConnection(ok) {
+            $('onlineDot').classList.toggle('warn', !ok);
+            $('onlineLabel').textContent = ok ? 'Online' : 'Reconnecting…';
+        }
+
+        async function poll() {
+            if (polling || !online) return;
+            polling = true;
+            try {
+                const data = await api(`/api/admin/live/poll?since=${lastMsgId}`);
+                applyPoll(data);
+                setConnection(true);
+            } catch (e) {
+                if (e.status === 401 || e.status === 403) {
+                    showApiError(e);
+                    online = false;
+                    stopTicker();
+                    $('agentPanel').style.display = 'none';
+                    $('loginScreen').style.display = 'flex';
+                } else {
+                    setConnection(false);
+                }
+            } finally {
+                polling = false;
+            }
+        }
+
+        function applyPoll(data) {
+            const myEmail = (me.email || '').toLowerCase();
+            const seen = new Set();
+
+            // Requests and live chats
+            data.chats.forEach((c) => {
+                seen.add(c.id);
+                if (dismissed.has(c.id)) return;
+
+                const pending = c.status === 'pending';
+                const mine = c.status === 'live' && (c.agent_email || '').toLowerCase() === myEmail;
+
+                if (!pending && !mine) {            // taken by another agent
+                    if (chats[c.id]) removeChat(c.id);
+                    return;
+                }
+
+                let chat = chats[c.id];
+                if (!chat) {
+                    chat = chats[c.id] = {
+                        id: c.id,
+                        userName: c.customer_name || 'Customer',
+                        lastMessage: c.last_message || '',
+                        time: fmtTime(c.created_at),
+                        status: c.status,
+                        agentEmail: c.agent_email,
+                        messages: [],
+                        msgIds: new Set()
+                    };
+                    if (pending && !firstPoll) {
+                        showToast('New request from ' + chat.userName, chat.lastMessage || 'Requesting an agent');
+                        sendAgentAlertNotification('💬 Live Agent Requested',
+                            `${chat.userName}: ${chat.lastMessage || 'A new client is asking to speak with a live agent.'}`);
+                    }
+                }
+                chat.status = c.status;
+                chat.agentEmail = c.agent_email;
+            });
+
+            // Chats that disappeared: expired, or ended by the visitor
+            Object.keys(chats).forEach((id) => {
+                const chat = chats[id];
+                if (seen.has(id) || chat.status === 'ended') return;
+                if (chat.status === 'live') {
+                    addMessage(chat, { sender: 'system', text: '🔴 User disconnected', created_at: new Date().toISOString() });
+                    chat.status = 'ended';
+                } else {
+                    removeChat(id);
+                }
+            });
+
+            // Messages
+            data.messages.forEach((m) => {
+                if (m.id > lastMsgId) lastMsgId = m.id;
+                if (chats[m.chat_id]) addMessage(chats[m.chat_id], m);
+            });
+
+            firstPoll = false;
+            renderSidebar();
+            if (activeChatId && chats[activeChatId]) renderMessages(activeChatId);
+        }
+
+        function removeChat(id) {
+            delete chats[id];
+            if (activeChatId === id) { activeChatId = null; showPlaceholder(); }
+        }
+
+        function addMessage(chat, m) {
+            if (m.id != null) {
+                if (chat.msgIds.has(m.id)) return;
+                chat.msgIds.add(m.id);
+            }
+            chat.messages.push({ sender: m.sender, text: m.text, time: fmtTime(m.created_at) });
+        }
+
+        /* ── Chat list ── */
+
+        function renderSidebar() {
+            const list = $('requestList');
+            list.innerHTML = '';
+            const entries = Object.values(chats).filter((c) => c.status !== 'ended');
+            if (!entries.length) { list.appendChild($('emptyState')); return; }
+
+            entries.forEach((chat) => {
+                const card = document.createElement('div');
+                card.className = `request-card ${chat.status} ${activeChatId === chat.id ? 'active' : ''}`;
+                card.innerHTML = `
+                    <div class="rc-header">
+                        <span class="rc-name">${esc(chat.userName)}</span>
+                        <span class="rc-time">${esc(chat.time)}</span>
+                    </div>
+                    <div class="rc-preview">${esc(chat.lastMessage || '(no message)')}</div>
+                    ${chat.status === 'pending' ? `
+                        <div class="rc-actions">
+                            <button class="btn-accept"><i class="fas fa-check"></i> Accept</button>
+                            <button class="btn-deny"><i class="fas fa-times"></i> Deny</button>
+                        </div>` : `
+                        <span class="rc-live-badge"><i class="fas fa-circle" style="font-size:8px"></i> Live</span>`}`;
+
+                const acceptBtn = card.querySelector('.btn-accept');
+                const denyBtn = card.querySelector('.btn-deny');
+                if (acceptBtn) acceptBtn.addEventListener('click', (ev) => { ev.stopPropagation(); acceptChat(chat.id, acceptBtn); });
+                if (denyBtn) denyBtn.addEventListener('click', (ev) => { ev.stopPropagation(); denyChat(chat.id); });
+                card.addEventListener('click', () => openChat(chat.id));
+                list.appendChild(card);
+            });
+        }
+
+        /* ── Chat actions ── */
+
+        async function acceptChat(id, btn) {
+            const chat = chats[id];
+            if (!chat) return;
+            if (btn) btn.disabled = true;
+            try {
+                const res = await api(`/api/admin/live/chats/${id}/accept`, { method: 'POST', body: { agent_name: agentName } });
+                chat.status = 'live';
+                chat.agentEmail = me.email;
+                addMessage(chat, res.message);
+                openChat(id);
+            } catch (e) {
+                if (e.status === 409) { showToast('Too late', 'Another agent already took this request.', true); removeChat(id); }
+                else showApiError(e);
+            }
+            renderSidebar();
+        }
+
+        // Deny hides the request for this agent only. Other agents still see it,
+        // and it counts as missed if nobody accepts in time.
+        function denyChat(id) {
+            dismissed.add(id);
+            removeChat(id);
+            renderSidebar();
+        }
+
+        function openChat(id) {
+            const chat = chats[id];
+            if (!chat) return;
+            activeChatId = id;
+            $('chatPlaceholder').style.display = 'none';
+            $('activeChat').style.display = 'flex';
+            $('activeChatName').textContent = chat.userName;
+            $('activeChatSub').textContent = chat.status === 'live' ? 'Live session' : 'Pending acceptance';
+            const canType = chat.status === 'live';
+            $('agentInput').disabled = !canType;
+            $('agentSend').disabled = !canType;
+            renderMessages(id);
+            renderSidebar();
+            if (canType) $('agentInput').focus();
+        }
+
+        function showPlaceholder() {
+            $('chatPlaceholder').style.display = 'flex';
+            $('activeChat').style.display = 'none';
+        }
+
+        function renderMessages(id) {
+            const chat = chats[id];
+            if (!chat) return;
+            const wrap = $('messagesWrap');
+            const stick = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight < 80;
+
+            wrap.innerHTML = '';
+            chat.messages.forEach((m) => {
+                const d = document.createElement('div');
+                if (m.sender === 'system') {
+                    d.className = 'system-notice';
+                    d.textContent = m.text;
+                } else {
+                    const mineMsg = m.sender === 'agent';
+                    d.className = `msg ${mineMsg ? 'msg-agent' : 'msg-user'}`;
+                    d.innerHTML = `
+                        <div class="msg-label">${esc(mineMsg ? agentName : chat.userName)}</div>
+                        ${esc(m.text)}
+                        <div class="msg-ts">${esc(m.time)}</div>`;
+                }
+                wrap.appendChild(d);
+            });
+            if (stick) wrap.scrollTop = wrap.scrollHeight;
+
+            const canType = chat.status === 'live';
+            $('agentInput').disabled = !canType;
+            $('agentSend').disabled = !canType;
+            $('activeChatSub').textContent = chat.status === 'live' ? 'Live session'
+                : chat.status === 'ended' ? 'Session ended' : 'Pending acceptance';
+        }
+
+        async function sendAgentMessage() {
+            const text = $('agentInput').value.trim();
+            const chat = activeChatId && chats[activeChatId];
+            if (!text || !chat || chat.status !== 'live') return;
+
+            $('agentInput').value = '';
+            try {
+                const res = await api(`/api/admin/live/chats/${chat.id}/messages`, { method: 'POST', body: { text } });
+                addMessage(chat, res.message);
+                renderMessages(chat.id);
+            } catch (e) {
+                $('agentInput').value = text;
+                showApiError(e);
+            }
+            $('agentInput').focus();
+        }
+
+        $('agentSend').addEventListener('click', sendAgentMessage);
+        $('agentInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAgentMessage(); }
+        });
+
+        $('endChatBtn').addEventListener('click', async () => {
+            const chat = activeChatId && chats[activeChatId];
+            if (!chat) return;
+            if (chat.status === 'live') {
+                try {
+                    await api(`/api/admin/live/chats/${chat.id}/end`, { method: 'POST' });
+                } catch (e) {
+                    showApiError(e);
+                    return;
+                }
+                chat.status = 'ended';
+                addMessage(chat, { sender: 'system', text: '🔄 You ended this session', created_at: new Date().toISOString() });
+            }
+            activeChatId = null;
+            renderSidebar();
+            showPlaceholder();
+        });
+
+        /* ── Helpers ── */
+
+        function fmtTime(iso) {
+            const d = iso ? new Date(iso) : new Date();
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
         function esc(str) {
-            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
     </script>
 </body>
