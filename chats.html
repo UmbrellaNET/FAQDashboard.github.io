@@ -3,32 +3,33 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UmbrellaNet</title>
-
-  <link rel="apple-touch-icon" sizes="180x180" href="img/logo.svg">
-  <link rel="icon" type="image/png" sizes="32x32" href="img/logo.svg">
-  <link rel="icon" type="image/png" sizes="16x16" href="img/logo.svg">
+  <title>UmbrellaNet – Chats</title>
+  <link rel="icon" type="image/svg+xml" href="img/logo.svg">
 
   <style>
     :root{
-      --bg:#1c1a2e; --primary:#5E185B; --accent:#EBB2E6; --secondary:#32c245;
+      --bg:#1c1a2e; --primary:#5E185B; --accent:#EBB2E6; --red:#ef4444;
       --muted:#2b2b44; --text:#f1e6f9; --card:#2a2740;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     }
     body{margin:0;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
-    .app{display:grid;grid-template-columns:260px 280px 1fr;height:100vh;}
+    .app{display:grid;grid-template-columns:260px 300px 1fr;height:100vh;}
 
-    /* ── Sidebar ── */
+    /* ── Menu ── */
     .sidebar{background:var(--card);border-right:1px solid #333;display:flex;flex-direction:column;padding:20px;overflow:hidden;}
     .brand{display:flex;gap:12px;align-items:center;margin-bottom:20px}
-    .logo{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
-    .brand h1{font-size:18px;margin:0}
+    .logo{width:48px;height:48px;display:flex;align-items:center;justify-content:center}
+    .logo-img{width:60px;height:60px;object-fit:contain;}
+    .brand h1{font-size:18px;margin:0;color:#fff}
+    .brand .sub{font-size:12px;color:#fff}
     .nav{display:flex;flex-direction:column;gap:8px;margin-top:10px;overflow-y:auto;}
-    .nav a{color:var(--text);text-decoration:none;padding:10px;border-radius:8px}
-    .nav a:hover{background:var(--muted)}.nav a.active{background:var(--primary);color:white}
-    .new-chat{margin-top:auto;}
-    .new-chat input{width:100%;padding:8px;border-radius:8px;border:1px solid #444;background:var(--bg);color:var(--text);margin-bottom:8px;box-sizing:border-box;}
-    .new-chat button{width:100%;padding:8px;border-radius:8px;border:0;background:var(--primary);color:white;cursor:pointer}
+    .nav a{color:var(--text);text-decoration:none;padding:10px;border-radius:8px;display:flex;align-items:center}
+    .nav a:hover{background:var(--muted)}
+    .nav a.active{background:var(--primary);color:#fff}
+    #missedBadge{background:var(--red);color:#fff;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:none;align-items:center;justify-content:center;margin-left:auto;padding:0 5px}
+    .find{margin-top:auto;}
+    .find input{width:100%;padding:8px;border-radius:8px;border:1px solid #444;background:var(--bg);color:var(--text);margin-bottom:8px;box-sizing:border-box;}
+    .find button{width:100%;padding:8px;border-radius:8px;border:0;background:var(--primary);color:#fff;cursor:pointer}
 
     /* ── Session list ── */
     .chat-list{background:var(--card);border-right:1px solid #333;display:flex;flex-direction:column;overflow:hidden;}
@@ -38,48 +39,33 @@
     .refresh-btn:hover{background:var(--muted);}
     .chat-list-scroll{overflow-y:auto;flex:1;}
     .chat-item{padding:12px 16px;border-bottom:1px solid #333;cursor:pointer;display:flex;flex-direction:column;}
-    .chat-item:hover{background:var(--muted)}.chat-item.active{background:var(--primary);color:white}
-    .chat-name{font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .chat-item:hover{background:var(--muted)}
+    .chat-item.active{background:var(--primary);color:#fff}
+    .chat-name{font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;overflow-wrap:anywhere}
     .session-badge{font-size:10px;background:#333;color:#aaa;padding:1px 5px;border-radius:4px;font-weight:400;}
     .chat-item.active .session-badge{background:rgba(255,255,255,0.2);color:#eee;}
     .chat-preview{font-size:13px;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .chat-item.active .chat-preview{color:#ddd;}
-    .chat-time{font-size:11px;color:#999;align-self:flex-end;}
+    .chat-time{font-size:11px;color:#999;align-self:flex-end;margin-top:2px}
     .chat-item.active .chat-time{color:#ddd;}
 
-    /* ── Main area ── */
+    /* ── Conversation ── */
     .main{display:flex;flex-direction:column;overflow:hidden;}
     .topbar{background:var(--card);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;flex-shrink:0;}
-    .topbar nav{display:flex;gap:20px}
-    .topbar nav a{color:var(--text);text-decoration:none;font-weight:500}
-    .topbar nav a:hover{color:var(--accent)}
-    .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .topbar .hint{font-size:12px;color:#999}
     .chat-main{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#211f38,#1c1a2e)}
-    
-    /* ── IMPROVED MESSAGE STYLES: paragraphs, line breaks, readability ── */
-    .message{max-width:70%;padding:12px 14px;border-radius:12px;line-height:1.5;word-wrap:break-word;overflow-wrap:break-word;}
+    .message{max-width:70%;padding:12px 14px;border-radius:12px;line-height:1.5;overflow-wrap:anywhere;}
     .user{align-self:flex-start;background:var(--muted);color:var(--text)}
-    .bot{align-self:flex-end;background:var(--accent);color:white}
-    .message p { margin: 0 0 0.6em 0; }
-    .message p:last-child { margin-bottom: 0; }
-    .message br { display: block; margin: 0.3em 0; content: ""; }
-    /* preserve line breaks and spacing */
-    .message-content { white-space: pre-wrap; line-height: 1.5; }
-    .message-content p { margin: 0 0 0.6em 0; white-space: normal; }
-    .message-content p:last-child { margin-bottom: 0; }
-    
-    .composer{display:flex;gap:10px;padding:14px;border-top:1px solid #333;align-items:center;background:var(--card);flex-shrink:0;}
-    .composer input{flex:1;padding:10px 12px;border-radius:10px;border:1px solid #444;background:var(--bg);color:var(--text)}
-    .composer button.send{background:var(--primary);color:white;border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
-
-    /* ── Misc ── */
-    .status-message{text-align:center;color:#aaa;font-style:italic;margin:10px 0;}
+    .bot{align-self:flex-end;background:var(--accent);color:#fff}
+    .message-content p{margin:0 0 0.6em 0;}
+    .message-content p:last-child{margin-bottom:0;}
+    .role-label{font-size:10px;opacity:.65;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;}
     .message-status{font-size:11px;margin-top:4px;text-align:right;}
     .date-divider{text-align:center;color:#aaa;font-size:12px;margin:16px 0;position:relative;}
     .date-divider::before,.date-divider::after{content:'';position:absolute;top:50%;width:30%;height:1px;background:#444;}
     .date-divider::before{left:0;}.date-divider::after{right:0;}
-    .logo-img{width:60px;height:60px;object-fit:contain;}
-    .role-label{font-size:10px;opacity:.65;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;}
+    .status-message{text-align:center;color:#aaa;font-style:italic;margin:10px 0;padding:0 12px}
+    .status-message.error{color:#ff8a8a;font-style:normal}
     .loading-dots{display:flex;gap:4px;align-items:center;justify-content:center;padding:24px;}
     .loading-dots span{width:7px;height:7px;border-radius:50%;background:#888;animation:db 1.4s infinite ease-in-out;}
     .loading-dots span:nth-child(2){animation-delay:.2s;}
@@ -91,39 +77,23 @@
 <body>
 <div class="app">
 
-  <!-- ── Sidebar ── -->
+  <!-- ── Menu ── -->
   <aside class="sidebar">
     <div class="brand">
       <div class="logo"><img src="img/logo.svg" alt="" class="logo-img"></div>
       <div>
-        <h1 style="color:#fff;">UmbrellaNet</h1>
-        <div style="font-size:12px;color:white">Admin Dashboard</div>
+        <h1>UmbrellaNet</h1>
+        <div class="sub">Admin Dashboard</div>
       </div>
     </div>
     <nav class="nav">
       <a href="chats.html" class="active">Chats</a>
       <a href="analytics.html">Analytics</a>
       <a href="agent.html">Agent</a>
-      <a href="missed.html">
-          Missed Agent Requests
-                <span id="missedBadge" style="
-                    background:#ef4444;
-                    color:white;
-                    font-size:11px;
-                    font-weight:700;
-                    min-width:20px;
-                    height:20px;
-                    border-radius:10px;
-                    display:none;
-                    align-items:center;
-                    justify-content:center;
-                    margin-left:auto;
-                    padding:0 5px;
-                  ">0</span>
-            </a>
+      <a href="missed.html">Missed Agent Requests <span id="missedBadge">0</span></a>
       <a href="index2.html">Dashboard</a>
     </nav>
-    <div class="new-chat">
+    <div class="find">
       <input id="findInput" placeholder="Find session by ID" />
       <button id="findBtn">Find Session</button>
     </div>
@@ -132,7 +102,7 @@
   <!-- ── Session list ── -->
   <aside class="chat-list">
     <div class="chat-list-header">
-      <h2>Active Sessions</h2>
+      <h2>Sessions</h2>
       <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
     </div>
     <div class="chat-list-scroll" id="chatList">
@@ -140,292 +110,187 @@
     </div>
   </aside>
 
-  <!-- ── Main ── -->
+  <!-- ── Conversation (read only) ── -->
   <div class="main">
-    <div class="topbar"><strong id="chatTitle">Sessions</strong></div>
-    <div class="chat-area">
-      <section class="chat-main" id="chatMain">
-        <div class="status-message" style="margin-top:60px;">Select a session to view messages</div>
-      </section>
-      <div class="composer">
-        <input id="chatInput" placeholder="Select a session to view messages" disabled />
-        <button class="send" id="sendBtn" disabled>Send</button>
-      </div>
+    <div class="topbar">
+      <strong id="chatTitle">Sessions</strong>
+      <span class="hint">Read only</span>
     </div>
+    <section class="chat-main" id="chatMain">
+      <div class="status-message" style="margin-top:60px;">Select a session to view messages</div>
+    </section>
   </div>
 
-  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/missed-badge.js"></script>
+
 <script>
-  // ─── CONFIG ──────────────────────────────────────────────────────────────────
-  const CONFIG = {
-    upstash: {
-      endpoint: "https://quiet-snapper-78920.upstash.io",
-      token: "gQAAAAAAATRIAAIncDFmMTQwZmQyMTcyNDY0MWNkYmZkOGY0MDM3MjljODM3N3AxNzg5MjA"
-    }
-  };
-
-  // Python backend key format: umbrellanet_chat_{ipHash16}_{sessionId}
-  // Storage: Redis LIST via RPUSH. Each element is JSON: { role, text, timestamp? }
-  // First 2 items are system-prompt bootstrap → skip them
-  const BOOTSTRAP = 2;
-
   const $chatMain  = document.getElementById('chatMain');
-  const $chatInput = document.getElementById('chatInput');
-  const $sendBtn   = document.getElementById('sendBtn');
   const $chatList  = document.getElementById('chatList');
   const $chatTitle = document.getElementById('chatTitle');
   const $refresh   = document.getElementById('refreshBtn');
   const $findInput = document.getElementById('findInput');
   const $findBtn   = document.getElementById('findBtn');
 
-  let sessions    = {};   // key → turns[]
-  let currentKey  = null;
+  const LOADING = '<div class="loading-dots"><span></span><span></span><span></span></div>';
 
-  // ─── Upstash REST ─────────────────────────────────────────────────────────────
-  async function upstash(path) {
-    const res = await fetch(CONFIG.upstash.endpoint + path, {
-      headers: { Authorization: `Bearer ${CONFIG.upstash.token}` }
-    });
-    if (!res.ok) throw new Error(`Upstash ${res.status}: ${await res.text()}`);
-    return res.json();
-  }
+  let sessions = [];        // rows from the server: { ip_hash, session_id, message_count, last_at, last_text }
+  let openRequest = 0;      // lets us ignore a slow answer after the admin has clicked another session
 
-  async function scanKeys(pattern) {
-    let all = [], cursor = '0';
-    do {
-      const j = await upstash(`/scan/${cursor}?match=${encodeURIComponent(pattern)}&count=100`);
-      cursor = j.result[0];
-      all.push(...(j.result[1] || []));
-    } while (cursor !== '0');
-    return [...new Set(all)];
-  }
+  requireSignIn(() => {
+    startMissedBadge();
+    loadSessions();
+  });
 
-  async function fetchList(key) {
-    const j = await upstash(`/lrange/${encodeURIComponent(key)}/0/-1`);
-    return (j.result || []).map(s => { try { return JSON.parse(s); } catch { return null; } }).filter(Boolean);
-  }
-
-  // ─── Key helpers ──────────────────────────────────────────────────────────────
-  function parseKey(key) {
-    const s = key.replace(/^umbrellanet_chat_/, '');
-    const m = s.match(/^([0-9a-f]{16})_(.+)$/i);
-    return m ? { ipHash: m[1], sessionId: m[2] } : { ipHash: 'unknown', sessionId: s };
-  }
-
-  // ─── Load all sessions ────────────────────────────────────────────────────────
+  // ─── Session list ────────────────────────────────────────────────────────────
   async function loadSessions() {
-    $chatList.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
-    sessions = {};
+    $chatList.innerHTML = LOADING;
     try {
-      const keys = await scanKeys('umbrellanet_chat_*');
-      if (!keys.length) { $chatList.innerHTML = '<div class="status-message">No sessions found</div>'; return; }
+      const data = await api('/api/admin/sessions');
+      sessions = data.sessions || [];
 
-      const results = await Promise.allSettled(keys.map(async k => ({ key: k, turns: await fetchList(k) })));
+      if (!sessions.length) {
+        $chatList.innerHTML = '<div class="status-message">No sessions found</div>';
+        return;
+      }
+
       $chatList.innerHTML = '';
-
-      const valid = results
-        .filter(r => r.status === 'fulfilled' && r.value.turns.length > BOOTSTRAP)
-        .map(r => r.value);
-
-      if (!valid.length) { $chatList.innerHTML = '<div class="status-message">No sessions with messages</div>'; return; }
-
-      valid.forEach(({ key, turns }) => { sessions[key] = turns; addToList(key, turns); });
-
-      // Auto-select first item
-      const first = $chatList.querySelector('.chat-item');
-      if (first) switchSession(first.dataset.key, first);
-
+      sessions.forEach((s, i) => $chatList.appendChild(buildItem(s, i)));
+      if (sessions.length >= 300) {
+        $chatList.insertAdjacentHTML('beforeend', '<div class="status-message">Showing the 300 most recent sessions</div>');
+      }
+      openSession(0);
     } catch (err) {
-      console.error(err);
-      $chatList.innerHTML = `<div class="status-message">Error: ${err.message}</div>`;
+      showListError(err);
     }
   }
 
-  // ── Missed requests badge  ────────────────────────────────────
-  (async function () {
-    const UPSTASH_URL   = 'https://quiet-snapper-78920.upstash.io';
-    const UPSTASH_TOKEN = 'gQAAAAAAATRIAAIncDFmMTQwZmQyMTcyNDY0MWNkYmZkOGY0MDM3MjljODM3N3AxNzg5MjA';
-  
-    async function upstash(path) {
-      const r = await fetch(UPSTASH_URL + path, {
-        headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
-      });
-      return r.json();
-    }
-  
-    async function refreshMissedBadge() {
-      try {
-        // Total missed requests
-        const lenRes  = await upstash('/llen/umbrellanet_missed_requests');
-        const total   = lenRes.result || 0;
-  
-        // Seen IDs
-        const seenRes = await upstash('/smembers/umbrellanet_missed_seen');
-        const seen    = (seenRes.result || []).length;
-  
-        const unseen  = Math.max(0, total - seen);
-        const badge   = document.getElementById('missedBadge');
-        if (!badge) return;
-        badge.textContent = unseen;
-        badge.style.display = unseen > 0 ? 'inline-flex' : 'none';
-      } catch (e) {
-        console.warn('Badge fetch failed', e);
-      }
-    }
-  
-    // Listen for real-time pushes from the chat widget
-    const bc = new BroadcastChannel('umbrellanet_livechat');
-    bc.onmessage = (ev) => {
-      if (ev.data?.type === 'MISSED_REQUEST') refreshMissedBadge();
-    };
-  
-    refreshMissedBadge();
-    setInterval(refreshMissedBadge, 60000); // re-check every minute
-  })();
-
-  // ─── Add item to session list ─────────────────────────────────────────────────
-  function addToList(key, turns) {
-    const { ipHash, sessionId } = parseKey(key);
-    const real    = turns.slice(BOOTSTRAP);
-    const last    = real[real.length - 1];
-    const preview = last?.text ? (last.text.length > 32 ? last.text.slice(0, 32) + '…' : last.text) : 'No messages';
-
+  function buildItem(s, index) {
+    const preview = s.last_text ? (s.last_text.length > 32 ? s.last_text.slice(0, 32) + '…' : s.last_text) : 'No messages';
     const item = document.createElement('div');
-    item.className   = 'chat-item';
-    item.dataset.key = key;
-    item.innerHTML   = `
+    item.className = 'chat-item';
+    item.dataset.index = index;
+    item.innerHTML = `
       <div class="chat-name">
-        ${esc(sessionId)}
-        <span class="session-badge">${real.length} msg</span>
+        ${esc(s.session_id)}
+        <span class="session-badge">${s.message_count} msg</span>
       </div>
       <div class="chat-preview">${esc(preview)}</div>
-      <div class="chat-time">IP: ${ipHash.slice(0,8)}…</div>
+      <div class="chat-time">IP: ${esc(s.ip_hash.slice(0, 8))}… · ${esc(shortDateTime(s.last_at))}</div>
     `;
-    item.addEventListener('click', () => switchSession(key, item));
-    $chatList.appendChild(item);
+    item.addEventListener('click', () => openSession(index));
+    return item;
   }
 
-  // ─── Helper: convert plain text to HTML with proper paragraphs and line breaks ───
-  function formatMessageText(text) {
-    if (!text) return '';
-    // First escape HTML to prevent injection
-    let escaped = esc(text);
-    
-    // Split by double newlines to identify paragraphs
-    const paragraphs = escaped.split(/\n\s*\n/);
-    
-    const formattedParagraphs = paragraphs.map(para => {
-      // Trim the paragraph
-      let cleanedPara = para.trim();
-      if (cleanedPara === '') return '';
-      
-      // Replace single newlines within paragraph with <br> tags
-      const lines = cleanedPara.split(/\n/);
-      if (lines.length === 1) {
-        // Single line paragraph
-        return `<p>${lines[0]}</p>`;
-      } else {
-        // Multiple lines: join with <br> and wrap in <p>
-        const withBreaks = lines.join('<br>');
-        return `<p>${withBreaks}</p>`;
-      }
-    }).filter(p => p !== '');
-    
-    // If no paragraphs were created (e.g., no double line breaks), wrap whole text in <p>
-    if (formattedParagraphs.length === 0) {
-      const singleLine = escaped.replace(/\n/g, '<br>');
-      return `<p>${singleLine}</p>`;
+  function showListError(err) {
+    console.error(err);
+    const msg = err.status === 403 ? 'Your account is not approved to view chats.' : `Error: ${err.message}`;
+    $chatList.innerHTML = `<div class="status-message error">${esc(msg)}</div>`;
+  }
+
+  // ─── Open a session ──────────────────────────────────────────────────────────
+  async function openSession(index) {
+    const s = sessions[index];
+    if (!s) return;
+
+    document.querySelectorAll('.chat-item').forEach(el => el.classList.toggle('active', el.dataset.index === String(index)));
+    $chatTitle.textContent = `Session: ${s.session_id}`;
+    $chatMain.innerHTML = LOADING;
+
+    const thisRequest = ++openRequest;
+    try {
+      const qs = new URLSearchParams({ ip_hash: s.ip_hash, session_id: s.session_id });
+      const data = await api('/api/admin/messages?' + qs.toString());
+      if (thisRequest !== openRequest) return;      // another session was opened meanwhile
+      renderMessages(data.messages || []);
+    } catch (err) {
+      if (thisRequest !== openRequest) return;
+      console.error(err);
+      $chatMain.innerHTML = `<div class="status-message error">${esc('Error: ' + err.message)}</div>`;
     }
-    
-    return formattedParagraphs.join('');
   }
 
-  // ─── Render session messages with improved paragraph formatting ──────────────────
-  function renderSession(key) {
+  function renderMessages(messages) {
     $chatMain.innerHTML = '';
-    const turns = (sessions[key] || []).slice(BOOTSTRAP);
-    const { sessionId } = parseKey(key);
-
-    if (!turns.length) {
+    if (!messages.length) {
       $chatMain.innerHTML = '<div class="status-message">No messages in this session</div>';
       return;
     }
 
     let lastDate = null;
-    turns.forEach(turn => {
-      if (!turn?.text) return;
-      const isUser  = turn.role === 'user';
-      const cls     = isUser ? 'user' : 'bot';
-      const dateStr = turn.timestamp ? new Date(turn.timestamp).toDateString() : new Date().toDateString();
-
-      if (lastDate !== dateStr) {
+    messages.forEach(m => {
+      const when = new Date(m.created_at);
+      const dateStr = when.toDateString();
+      if (dateStr !== lastDate) {
         const d = document.createElement('div');
-        d.className   = 'date-divider';
+        d.className = 'date-divider';
         d.textContent = dateLabel(dateStr);
         $chatMain.appendChild(d);
         lastDate = dateStr;
       }
 
-      const timeStr = turn.timestamp
-        ? new Date(turn.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : '';
-
+      const isUser = m.role === 'user';
       const div = document.createElement('div');
-      div.className = `message ${cls}`;
-      
-      // Format message text with proper paragraphs and line breaks
-      const formattedHtml = formatMessageText(turn.text);
-      
+      div.className = `message ${isUser ? 'user' : 'bot'}`;
       div.innerHTML = `
         <div class="role-label">${isUser ? '👤 User' : '🤖 Assistant'}</div>
-        <div class="message-content">${formattedHtml}</div>
-        <div class="message-status" style="color:${isUser ? '#999' : 'rgba(255,255,255,0.6)'};">${timeStr}</div>
+        <div class="message-content">${formatMessageText(m.text)}</div>
+        <div class="message-status" style="color:${isUser ? '#999' : 'rgba(255,255,255,0.7)'};">${esc(when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}</div>
       `;
       $chatMain.appendChild(div);
     });
-
-    $chatTitle.textContent = `Session: ${sessionId}`;
     $chatMain.scrollTop = $chatMain.scrollHeight;
   }
 
-  // ─── Switch session ───────────────────────────────────────────────────────────
-  function switchSession(key, item) {
-    document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
-    item.classList.add('active');
-    currentKey = key;
-    renderSession(key);
-  }
-
-  // ─── Find session ─────────────────────────────────────────────────────────────
+  // ─── Find session ────────────────────────────────────────────────────────────
   $findBtn.addEventListener('click', () => {
-    const val = $findInput.value.trim();
+    const val = $findInput.value.trim().toLowerCase();
     if (!val) return;
-    const match = Object.keys(sessions).find(k => parseKey(k).sessionId === val);
-    if (match) {
-      const item = $chatList.querySelector(`.chat-item[data-key="${CSS.escape(match)}"]`);
-      if (item) switchSession(match, item);
+    let index = sessions.findIndex(s => s.session_id.toLowerCase() === val);
+    if (index === -1) index = sessions.findIndex(s => s.session_id.toLowerCase().includes(val));
+    if (index === -1) {
+      alert(`No session found with ID: ${$findInput.value.trim()}`);
     } else {
-      alert(`No session found with ID: ${val}`);
+      openSession(index);
+      const item = $chatList.querySelector(`.chat-item[data-index="${index}"]`);
+      if (item) item.scrollIntoView({ block: 'nearest' });
     }
     $findInput.value = '';
   });
   $findInput.addEventListener('keypress', e => { if (e.key === 'Enter') $findBtn.click(); });
+  $refresh.addEventListener('click', loadSessions);
 
-  // ─── Utils ───────────────────────────────────────────────────────────────────
-  function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  // ─── Helpers ─────────────────────────────────────────────────────────────────
+  // Escape first, then turn blank lines into paragraphs and single line breaks into <br>
+  function formatMessageText(text) {
+    const paragraphs = esc(text || '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    if (!paragraphs.length) return '';
+    return paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
   }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function shortDateTime(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
   function dateLabel(ds) {
     const today = new Date().toDateString();
-    const yest  = new Date(Date.now()-86400000).toDateString();
+    const yest  = new Date(Date.now() - 86400000).toDateString();
     if (ds === today) return 'Today';
     if (ds === yest)  return 'Yesterday';
-    return new Date(ds).toLocaleDateString([],{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    return new Date(ds).toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }
-
-  // ─── Init ─────────────────────────────────────────────────────────────────────
-  $refresh.addEventListener('click', loadSessions);
-  loadSessions();
 </script>
 </body>
 </html>
